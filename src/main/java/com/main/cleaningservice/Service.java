@@ -4,9 +4,9 @@ public class Service {
     private int id;
     private String name;
     private String description;
-    private int price;
+    private double price;
 
-    public Service(int id, String name, String description, int price) {
+    public Service(int id, String name, String description, double price) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,11 +37,11 @@ public class Service {
         this.description = description;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 }

@@ -1,34 +1,35 @@
 package com.main.cleaningservice;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Cleaning {
     private int id;
     private Address address;
     private PlaceType placeType;
     private CleaningType cleaningType;
-    private Date timeDate;
-    private int totalPrice = 0;
+    private Timestamp time;
+    private double totalPrice = 0.0;
     private int cleanersAmount = 0;
     private Client client;
 
-    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Date timeDate, int totalPrice, int cleanersAmount, Client client) {
+    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp time, double totalPrice, int cleanersAmount, Client client) {
         this.id = id;
         this.address = address;
         this.placeType = placeType;
         this.cleaningType = cleaningType;
-        this.timeDate = timeDate;
+        this.time = time;
         this.totalPrice = totalPrice;
         this.cleanersAmount = cleanersAmount;
         this.client = client;
     }
 
-    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Date timeDate, Client client) {
+    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp time, Client client) {
         this.id = id;
         this.address = address;
         this.placeType = placeType;
         this.cleaningType = cleaningType;
-        this.timeDate = timeDate;
+        this.time = time;
         this.client = client;
     }
 
@@ -64,19 +65,19 @@ public class Cleaning {
         this.cleaningType = cleaningType;
     }
 
-    public Date getTimeDate() {
-        return timeDate;
+    public Timestamp getTime() {
+        return time;
     }
 
-    public void setTimeDate(Date timeDate) {
-        this.timeDate = timeDate;
+    public void setTime(Timestamp time) {
+        this.time = time;
     }
 
-    public int getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(int totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 

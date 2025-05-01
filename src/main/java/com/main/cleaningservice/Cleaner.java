@@ -6,13 +6,13 @@ public class Cleaner {
     private int id;
     private String name;
     private String surname;
-    private String second_name;
+    private String secondName;
     private Date birthday;
 
-    public Cleaner(int id, Date birthday, String second_name, String surname, String name) {
+    public Cleaner(int id, Date birthday, String surname, String secondName, String name) {
         this.id = id;
         this.birthday = birthday;
-        this.second_name = second_name;
+        this.secondName = secondName;
         this.surname = surname;
         this.name = name;
     }
@@ -34,11 +34,11 @@ public class Cleaner {
     }
 
     public String getSecond_name() {
-        return second_name;
+        return secondName;
     }
 
-    public void setSecond_name(String second_name) {
-        this.second_name = second_name;
+    public void setSecond_name(String secondName) {
+        this.secondName = secondName;
     }
 
     public String getSurname() {

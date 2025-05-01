@@ -7,7 +7,7 @@ public class Client {
     private String secondName;
     private ClientType type;
 
-    public Client(int id, String name, String secondName, String surname, ClientType type) {
+    public Client(int id, String name, String surname, String secondName, ClientType type) {
         this.id = id;
         this.name = name;
         this.secondName = secondName;
