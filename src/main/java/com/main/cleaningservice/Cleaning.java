@@ -1,6 +1,5 @@
 package com.main.cleaningservice;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Cleaning {
@@ -8,28 +7,28 @@ public class Cleaning {
     private Address address;
     private PlaceType placeType;
     private CleaningType cleaningType;
-    private Timestamp time;
+    private Timestamp timestamp;
     private double totalPrice = 0.0;
     private int cleanersAmount = 0;
     private Client client;
 
-    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp time, double totalPrice, int cleanersAmount, Client client) {
+    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, double totalPrice, int cleanersAmount, Client client) {
         this.id = id;
         this.address = address;
         this.placeType = placeType;
         this.cleaningType = cleaningType;
-        this.time = time;
+        this.timestamp = timestamp;
         this.totalPrice = totalPrice;
         this.cleanersAmount = cleanersAmount;
         this.client = client;
     }
 
-    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp time, Client client) {
+    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) {
         this.id = id;
         this.address = address;
         this.placeType = placeType;
         this.cleaningType = cleaningType;
-        this.time = time;
+        this.timestamp = timestamp;
         this.client = client;
     }
 
@@ -65,12 +64,12 @@ public class Cleaning {
         this.cleaningType = cleaningType;
     }
 
-    public Timestamp getTime() {
-        return time;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
-    public void setTime(Timestamp time) {
-        this.time = time;
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 
     public double getTotalPrice() {

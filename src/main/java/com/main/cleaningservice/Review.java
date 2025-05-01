@@ -1,24 +1,24 @@
 package com.main.cleaningservice;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Review {
     private int id;
     private String title;
     private String body;
-    private Date publicationDate;
-    private Date lastChangeDate;
-    private Client client;
+    private Timestamp publicationTimestamp;
+    private Timestamp lastChangeTimestamp;
+    private Account account;
     private Cleaning cleaning;
     private int rating;
 
-    public Review(int id, String title, String body, Date publicationDate, Date lastChangeDate, Client client, Cleaning cleaning, int rating) {
+    public Review(int id, String title, String body, Timestamp publicationTimestamp, Timestamp lastChangeTimestamp, int rating, Account account, Cleaning cleaning) {
         this.id = id;
         this.title = title;
+        this.publicationTimestamp = publicationTimestamp;
         this.body = body;
-        this.publicationDate = publicationDate;
-        this.lastChangeDate = lastChangeDate;
-        this.client = client;
+        this.lastChangeTimestamp = lastChangeTimestamp;
+        this.account = account;
         this.cleaning = cleaning;
         this.rating = rating;
     }
@@ -39,6 +39,14 @@ public class Review {
         this.title = title;
     }
 
+    public Timestamp getPublicationTimestamp() {
+        return publicationTimestamp;
+    }
+
+    public void setPublicationTimestamp(Timestamp publicationTimestamp) {
+        this.publicationTimestamp = publicationTimestamp;
+    }
+
     public String getBody() {
         return body;
     }
@@ -47,36 +55,20 @@ public class Review {
         this.body = body;
     }
 
-    public Date getPublicationDate() {
-        return publicationDate;
+    public Timestamp getLastChangeTimestamp() {
+        return lastChangeTimestamp;
     }
 
-    public void setPublicationDate(Date publicationDate) {
-        this.publicationDate = publicationDate;
+    public void setLastChangeTimestamp(Timestamp lastChangeTimestamp) {
+        this.lastChangeTimestamp = lastChangeTimestamp;
     }
 
-    public Date getLastChangeDate() {
-        return lastChangeDate;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setLastChangeDate(Date lastChangeDate) {
-        this.lastChangeDate = lastChangeDate;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public Cleaning getCleaning() {
-        return cleaning;
-    }
-
-    public void setCleaning(Cleaning cleaning) {
-        this.cleaning = cleaning;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public int getRating() {
@@ -85,5 +77,13 @@ public class Review {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public Cleaning getCleaning() {
+        return cleaning;
+    }
+
+    public void setCleaning(Cleaning cleaning) {
+        this.cleaning = cleaning;
     }
 }

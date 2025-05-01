@@ -9,7 +9,7 @@ public class Cleaner {
     private String secondName;
     private Date birthday;
 
-    public Cleaner(int id, Date birthday, String surname, String secondName, String name) {
+    public Cleaner(int id, String name, String surname, String secondName, Date birthday) {
         this.id = id;
         this.birthday = birthday;
         this.secondName = secondName;

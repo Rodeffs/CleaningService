@@ -332,15 +332,180 @@ public class DBAdapter {
         System.out.println("Cleaner " + cleaner.getId() + " deleted");
     }
 
+    public Cleaner selectCleaner(int cleanerId) throws SQLException {
+        Cleaner cleaner = null;
+
+        String sql = "SELECT * FROM cleaner WHERE cleaner_id = " + cleanerId;
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.first()) {
+            String name = rs.getString("cleaner_name");
+            String surname = rs.getString("cleaner_surname");
+            String secondName = rs.getString("cleaner_second_name");
+            Date birthday = rs.getDate("cleaner_birthday");
+            cleaner = new Cleaner(cleanerId, name, surname, secondName, birthday);
+        }
+
+        rs.close();
+        statement.close();
+        return cleaner;
+    }
+
+    public ArrayList<Cleaner> selectCleaners() throws SQLException {
+        ArrayList<Cleaner> cleaners = null;
+
+        String sql = "SELECT * FROM cleaner";
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next()) {
+            int id = rs.getInt("cleaner_id");
+            String name = rs.getString("cleaner_name");
+            String surname = rs.getString("cleaner_surname");
+            String secondName = rs.getString("cleaner_second_name");
+            Date birthday = rs.getDate("cleaner_birthday");
+            cleaners.add(new Cleaner(id, name, surname, secondName, birthday));
+        }
+
+        rs.close();
+        statement.close();
+        return cleaners;
+    }
+
     // CLEANING
 
-    public void insertCleaning(Address address, PlaceType placeType, CleaningType cleaningType, Timestamp time, Client client) throws SQLException{
-        String sql = "INSERT INTO cleaning(address_id, place_type_id, cleaning_type_id, time_date, client_id) VALUES (" + address.getId() + ", " + placeType.getId() + ", " + cleaningType.getId() + ", '" + time.toString() + "', " + client.getId() + ")";
+    public void insertCleaning(Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) throws SQLException {
+        String sql = "INSERT INTO cleaning(address_id, place_type_id, cleaning_type_id, time_date, client_id) VALUES (" + address.getId() + ", " + placeType.getId() + ", " + cleaningType.getId() + ", '" + timestamp.toString() + "', " + client.getId() + ")";
         executeStatement(sql);
         System.out.println("Cleaning added");
     }
 
+    public void updateCleaningAddress(Cleaning cleaning, Address address) throws SQLException {
+        String sql = "UPDATE cleaning SET address_id = " + address.getId() + " WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        cleaning.setAddress(address);
+        System.out.println("Cleaning " + cleaning.getId() + " address changed");
+    }
 
+    public void updateCleaningPlaceType(Cleaning cleaning, PlaceType placeType) throws SQLException {
+        String sql = "UPDATE cleaning SET place_type_id = " + placeType.getId() + " WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        cleaning.setPlaceType(placeType);
+        System.out.println("Cleaning " + cleaning.getId() + " place type changed");
+    }
+
+    public void updateCleaningType(Cleaning cleaning, CleaningType cleaningType) throws SQLException {
+        String sql = "UPDATE cleaning SET cleaning_type_id = " + cleaningType.getId() + " WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        cleaning.setCleaningType(cleaningType);
+        System.out.println("Cleaning " + cleaning.getId() + " type changed");
+    }
+
+    public void updateCleaningTimestamp(Cleaning cleaning, Timestamp timestamp) throws SQLException {
+        String sql = "UPDATE cleaning SET time_date = '" + timestamp.toString() + "' WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        cleaning.setTimestamp(timestamp);
+        System.out.println("Cleaning " + cleaning.getId() + " timestamp changed");
+    }
+
+    public void updateCleaningClient(Cleaning cleaning, Client client) throws SQLException {
+        String sql = "UPDATE cleaning SET client_id = " + client.getId() + " WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        cleaning.setClient(client);
+        System.out.println("Cleaning " + cleaning.getId() + " client changed");
+    }
+
+    public void deleteCleaning(Cleaning cleaning) throws SQLException {
+        String sql = "DELETE FROM cleaning WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        System.out.println("Cleaning " + cleaning.getId() + " deleted");
+    }
+
+    public Cleaning selectCleaning(int cleaningId) throws SQLException {
+        Cleaning cleaning = null;
+
+        String sql = "SELECT * FROM cleaning WHERE cleaning_id = " + cleaningId;
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.first()) {
+            Address address = selectAddress(rs.getInt("address_id"));
+            PlaceType placeType = selectPlaceType(rs.getInt("place_type_id"));
+            CleaningType cleaningType = selectCleaningType(rs.getInt("cleaning_type_id"));
+            Timestamp timestamp = rs.getTimestamp("time_date");
+            Client client = selectClient(rs.getInt("client_id"));
+            cleaning = new Cleaning(cleaningId, address, placeType, cleaningType, timestamp, client);
+        }
+
+        rs.close();
+        statement.close();
+        return cleaning;
+    }
+
+    public ArrayList<Cleaning> selectCleanings() throws SQLException {
+        ArrayList<Cleaning> cleanings = new ArrayList<Cleaning>();
+
+        String sql = "SELECT * FROM cleaning";
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next()) {
+            int id = rs.getInt("cleaning_id");
+            Address address = selectAddress(rs.getInt("address_id"));
+            PlaceType placeType = selectPlaceType(rs.getInt("place_type_id"));
+            CleaningType cleaningType = selectCleaningType(rs.getInt("cleaning_type_id"));
+            Timestamp timestamp = rs.getTimestamp("time_date");
+            Client client = selectClient(rs.getInt("client_id"));
+            cleanings.add(new Cleaning(id, address, placeType, cleaningType, timestamp, client));
+        }
+
+        rs.close();
+        statement.close();
+        return cleanings;
+    }
+
+    public ArrayList<Cleaner> selectCleaningCleaners(Cleaning cleaning) throws SQLException {
+        ArrayList<Cleaner> cleaners = new ArrayList<Cleaner>();
+
+        String sql = "SELECT cleaner_id FROM cleaning_cleaners WHERE cleaning_id = " + cleaning.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next())
+            cleaners.add(selectCleaner(rs.getInt(1)));
+
+        rs.close();
+        statement.close();
+        return cleaners;
+    }
+
+    public ArrayList<Service> selectCleaningServices(Cleaning cleaning) throws SQLException {
+        ArrayList<Service> services = new ArrayList<Service>();
+
+        String sql = "SELECT cleaner_id FROM cleaning_services WHERE cleaning_id = " + cleaning.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next())
+            services.add(selectService(rs.getInt(1)));
+
+        rs.close();
+        statement.close();
+        return services;
+    }
+
+    public void calculateTotalPrice(Cleaning cleaning) throws SQLException { // using premade procedure in Postgres to not blow my brains out
+        String sql = "CALL calculate_total_price(" + cleaning.getId() + ")";
+        executeStatement(sql);
+        System.out.println("Cleaning " + cleaning.getId() + " total price calculated");
+    }
+
+    public void calculateCleanersAmount(Cleaning cleaning) throws SQLException { // using premade procedure in Postgres to not blow my brains out
+        String sql = "CALL calculate_cleaners_amount(" + cleaning.getId() + ")";
+        executeStatement(sql);
+        System.out.println("Cleaning " + cleaning.getId() + " cleaners amount calculated");
+    }
 
     // CLEANING TYPE
 
@@ -785,6 +950,12 @@ public class DBAdapter {
         rs.close();
         statement.close();
         return placeTypes;
+    }
+
+    // REVIEW
+
+    public void insertReview(String title, String body, Timestamp publicationTimestamp, Timestamp lastChangeTimestamp, int rating, Account account, Cleaning cleaning) throws SQLException {
+
     }
 
     // SERVICE
