@@ -29,6 +29,12 @@ public class DBAdapter {
         System.out.println("Account added");
     }
 
+    public void insertAccount(String login, String password, String displayName) throws SQLException {
+        String sql = "INSERT INTO account(login, password, display_name) VALUES ('" + login + "', '" + password + "', '" + displayName + "')";
+        executeStatement(sql);
+        System.out.println("Account added");
+    }
+
     public void updateAccountLogin(Account account, String newLogin) throws SQLException {
         String sql = "UPDATE account SET login = '" + newLogin + "' WHERE account_id = " + account.getId();
         executeStatement(sql);
@@ -70,12 +76,33 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String login = rs.getString("login");
             String password = rs.getString("password");
             AccountType accountType = selectAccountType(rs.getInt("account_type_id"));
             String displayName = rs.getString("display_name");
             account = new Account(accountId, login, password, accountType, displayName);
+        }
+
+        rs.close();
+        statement.close();
+        return account;
+    }
+
+    public Account selectAccount(String login) throws SQLException {
+        Account account = null;
+
+        String sql = "SELECT * FROM account WHERE login = '" + login + "'";
+
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.next()) {
+            int id = rs.getInt("account_id");
+            String password = rs.getString("password");
+            AccountType accountType = selectAccountType(rs.getInt("account_type_id"));
+            String displayName = rs.getString("display_name");
+            account = new Account(id, login, password, accountType, displayName);
         }
 
         rs.close();
@@ -115,7 +142,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String name = rs.getString("account_type_name");
             accountType = new AccountType(accountTypeId, name);
         }
@@ -200,7 +227,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             Street street = selectStreet(rs.getInt("street_id"));
             int buildingNumber = rs.getInt("building_number");
             int entranceNumber = rs.getInt("entrance_number");
@@ -272,7 +299,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String name = rs.getString("city_name");
             Country country = selectCountry(rs.getInt("country_id"));
             city = new City(cityId, country, name);
@@ -348,7 +375,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String name = rs.getString("cleaner_name");
             String surname = rs.getString("cleaner_surname");
             String secondName = rs.getString("cleaner_second_name");
@@ -362,7 +389,7 @@ public class DBAdapter {
     }
 
     public ArrayList<Cleaner> selectCleaners() throws SQLException {
-        ArrayList<Cleaner> cleaners = null;
+        ArrayList<Cleaner> cleaners = new ArrayList<Cleaner>();
 
         String sql = "SELECT * FROM cleaner";
         Statement statement = conn.createStatement();
@@ -438,7 +465,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             Address address = selectAddress(rs.getInt("address_id"));
             PlaceType placeType = selectPlaceType(rs.getInt("place_type_id"));
             CleaningType cleaningType = selectCleaningType(rs.getInt("cleaning_type_id"));
@@ -544,7 +571,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String name = rs.getString("cleaning_type_name");
             cleaningType = new CleaningType(cleaningTypeId, name);
         }
@@ -574,8 +601,8 @@ public class DBAdapter {
 
     // CLIENT
 
-    public void insertClient(String name, String surname, String secondName, ClientType clientType) throws SQLException {
-        String sql = "INSERT INTO client(client_name, client_surname, client_second_name, client_type_id) VALUES ('" + name + "', '" + surname + "', '" + secondName + "', " + clientType.getId() + ")";
+    public void insertClient(String name, String surname, String secondName, ClientType clientType, Account account, String email, String phone) throws SQLException {
+        String sql = "INSERT INTO client(client_name, client_surname, client_second_name, client_type_id, account_id, client_email, client_phone) VALUES ('" + name + "', '" + surname + "', '" + secondName + "', " + clientType.getId() + ", " + account.getId() + ", '" + email + "', '" + phone + "')";
         executeStatement(sql);
         System.out.println("Client added");
     }
@@ -604,6 +631,24 @@ public class DBAdapter {
         System.out.println("Client " + client.getId() + " type updated");
     }
 
+    public void updateClientAccount(Client client, Account account) throws SQLException {
+        String sql = "UPDATE client SET account_id = " + account.getId() + " WHERE client_id = " + client.getId();
+        executeStatement(sql);
+        System.out.println("Client " + client.getId() + " account updated");
+    }
+
+    public void updateClientEmail(Client client, String newEmail) throws SQLException {
+        String sql = "UPDATE client SET client_email = '" + newEmail + "' WHERE client_id = " + client.getId();
+        executeStatement(sql);
+        System.out.println("Client " + client.getId() + " email updated");
+    }
+
+    public void updateClientPhone(Client client, String newPhone) throws SQLException {
+        String sql = "UPDATE client SET client_phone = '" + newPhone + "' WHERE client_id = " + client.getId();
+        executeStatement(sql);
+        System.out.println("Client " + client.getId() + " phone updated");
+    }
+
     public void deleteClient(Client client) throws SQLException {
         String sql = "DELETE FROM client WHERE client_id = " + client.getId();
         executeStatement(sql);
@@ -617,12 +662,15 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String name = rs.getString("client_name");
             String surname = rs.getString("client_surname");
             String secondName = rs.getString("client_second_name");
             ClientType clientType = selectClientType(rs.getInt("client_type_id"));
-            client = new Client(clientId, name, surname, secondName, clientType);
+            Account account = selectAccount(rs.getInt("account_id"));
+            String email = rs.getString("client_email");
+            String phone = rs.getString("client_phone");
+            client = new Client(clientId, name, surname, secondName, clientType, account, email, phone);
         }
 
         rs.close();
@@ -643,57 +691,15 @@ public class DBAdapter {
             String surname = rs.getString("client_surname");
             String secondName = rs.getString("client_second_name");
             ClientType clientType = selectClientType(rs.getInt("client_type_id"));
-            clients.add(new Client(id, name, surname, secondName, clientType));
+            Account account = selectAccount(rs.getInt("account_id"));
+            String email = rs.getString("client_email");
+            String phone = rs.getString("client_phone");
+            clients.add(new Client(id, name, surname, secondName, clientType, account, email, phone));
         }
 
         rs.close();
         statement.close();
         return clients;
-    }
-
-    public Account selectClientAccount(Client client) throws SQLException {
-        Account account = null;
-
-        String sql = "SELECT account_id FROM client_account WHERE client_id = " + client.getId();
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        if (rs.first())
-            account = selectAccount(rs.getInt(1));
-
-        rs.close();
-        statement.close();
-        return account;
-    }
-
-    public ArrayList<Email> selectClientEmails(Client client) throws SQLException {
-        ArrayList<Email> emails = new ArrayList<Email>();
-
-        String sql = "SELECT email_id FROM client_emails WHERE client_id = " + client.getId();
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        while (rs.next())
-            emails.add(selectEmail(rs.getInt(1)));
-
-        rs.close();
-        statement.close();
-        return emails;
-    }
-
-    public ArrayList<Phone> selectClientPhones(Client client) throws SQLException {
-        ArrayList<Phone> phones = new ArrayList<Phone>();
-
-        String sql = "SELECT phone_id FROM client_phone WHERE client_id = " + client.getId();
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        while (rs.next())
-            phones.add(selectPhone(rs.getInt(1)));
-
-        rs.close();
-        statement.close();
-        return phones;
     }
 
     // CLIENT TYPE
@@ -705,10 +711,26 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
-            int id = rs.getInt("client_type_id");
+        if (rs.next()) {
             String name = rs.getString("client_type_name");
-            clientType = new ClientType(id, name);
+            clientType = new ClientType(clientTypeId, name);
+        }
+
+        rs.close();
+        statement.close();
+        return clientType;
+    }
+
+    public ClientType selectClientType(String clientTypeName) throws SQLException {
+        ClientType clientType = null;
+
+        String sql = "SELECT * FROM client_type WHERE client_type_name = '" + clientTypeName + "'";
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.next()) {
+            int id = rs.getInt("client_type_id");
+            clientType = new ClientType(id, clientTypeName);
         }
 
         rs.close();
@@ -763,7 +785,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             int id = rs.getInt("country_id");
             String name = rs.getString("country_name");
             country = new Country(id, name);
@@ -791,117 +813,6 @@ public class DBAdapter {
         rs.close();
         statement.close();
         return countries;
-    }
-
-    // EMAIL
-
-    public void insertEmail(String emailAddress) throws SQLException {
-        String sql = "INSERT INTO email(email_address) VALUES ('" + emailAddress + "')";
-        executeStatement(sql);
-        System.out.println("Email added");
-    }
-
-    public void updateEmailAddress(Email email, String newEmailAddress) throws SQLException {
-        String sql = "UPDATE email SET email_address = '" + newEmailAddress + "' WHERE email_id = " + email.getId();
-        executeStatement(sql);
-        email.setEmailAddress(newEmailAddress);
-        System.out.println("Email " + email.getId() + " address changed");
-    }
-
-    public void deleteEmail(Email email) throws SQLException {
-        String sql = "DELETE FROM email WHERE email_id = " + email.getId();
-        executeStatement(sql);
-        System.out.println("Email " + email.getId() + " deleted");
-    }
-
-    public Email selectEmail(int emailId) throws SQLException {
-        Email email = null;
-
-        String sql = "SELECT * FROM email WHERE email_id = " + emailId;
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        if (rs.first()) {
-            String emailAddress = rs.getString("email_address");
-            email = new Email(emailId, emailAddress);
-        }
-
-        rs.close();
-        statement.close();
-        return email;
-    }
-
-    public ArrayList<Email> selectEmails() throws SQLException {
-        ArrayList<Email> emails = new ArrayList<Email>();
-
-        String sql = "SELECT * FROM email";
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        while (rs.next()) {
-            int id = rs.getInt("email_id");
-            String emailAddress = rs.getString("email_address");
-            emails.add(new Email(id, emailAddress));
-        }
-
-        rs.close();
-        statement.close();
-        return emails;
-    }
-
-    // PHONE
-
-    public void insertPhone(String phoneNumber) throws SQLException {
-        String sql = "INSERT INTO phone(phone_number) VALUES ('" + phoneNumber + "')";
-        executeStatement(sql);
-        System.out.println("Phone added");
-    }
-
-    public void updatePhoneNumber(Phone phone, String newPhoneNumber) throws SQLException {
-        String sql = "UPDATE phone SET phone_number = '" + newPhoneNumber + "' WHERE phone_id = " + phone.getId();
-        executeStatement(sql);
-        System.out.println("Phone " + phone.getId() + " number updated");
-    }
-
-    public void deletePhone(Phone phone) throws SQLException {
-        String sql = "DELETE FROM phone WHERE phone_id = " + phone.getId();
-        executeStatement(sql);
-        System.out.println("Phone " + phone.getId() + " deleted");
-    }
-
-    public Phone selectPhone(int phoneId) throws SQLException {
-        Phone phone = null;
-
-        String sql = "SELECT * FROM phone WHERE phone_id = " + phoneId;
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        if (rs.first()) {
-            String phoneNumber = rs.getString("phone_number");
-            phone = new Phone(phoneId, phoneNumber);
-        }
-
-        rs.close();
-        statement.close();
-        return phone;
-    }
-
-    public ArrayList<Phone> selectPhones() throws SQLException {
-        ArrayList<Phone> phones = new ArrayList<Phone>();
-
-        String sql = "SELECT * FROM phone";
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        while (rs.next()) {
-            int id = rs.getInt("phone_id");
-            String phoneNumber = rs.getString("phone_number");
-            phones.add(new Phone(id, phoneNumber));
-        }
-
-        rs.close();
-        statement.close();
-        return phones;
     }
 
     // PLACE TYPE
@@ -932,7 +843,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             int id = rs.getInt("place_type_id");
             String name = rs.getString("place_type_name");
             placeType = new PlaceType(id, name);
@@ -1031,7 +942,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             String title = rs.getString("title");
             String body = rs.getString("body");
             Timestamp publicationTimestamp = rs.getTimestamp("publication_timestamp");
@@ -1115,7 +1026,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             int id = rs.getInt("service_id");
             String name = rs.getString("service_name");
             String description = rs.getString("service_description");
@@ -1184,7 +1095,7 @@ public class DBAdapter {
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        if (rs.first()) {
+        if (rs.next()) {
             int id = rs.getInt("street_id");
             String name = rs.getString("street_name");
             City city = selectCity(rs.getInt("city_id"));

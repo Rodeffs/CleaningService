@@ -1,6 +1,7 @@
 package com.main.cleaningservice;
 
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class CleaningServiceApplication extends Application {
@@ -10,7 +11,9 @@ public class CleaningServiceApplication extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-
+    public void start(Stage primaryStage) throws Exception {
+        Scene scene = new Scene(new GlobalLayoutBuilder().build());
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 }

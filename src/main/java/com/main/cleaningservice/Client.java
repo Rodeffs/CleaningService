@@ -6,13 +6,19 @@ public class Client {
     private String surname;
     private String secondName;
     private ClientType type;
+    private Account account;
+    private String email;
+    private String phone;
 
-    public Client(int id, String name, String surname, String secondName, ClientType type) {
+    public Client(int id, String name, String surname, String secondName, ClientType type, Account account, String email, String phone) {
         this.id = id;
         this.name = name;
-        this.secondName = secondName;
         this.surname = surname;
+        this.secondName = secondName;
         this.type = type;
+        this.account = account;
+        this.email = email;
+        this.phone = phone;
     }
 
     public int getId() {
@@ -53,5 +59,29 @@ public class Client {
 
     public void setType(ClientType type) {
         this.type = type;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
