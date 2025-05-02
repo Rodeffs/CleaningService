@@ -969,7 +969,107 @@ public class DBAdapter {
         System.out.println("Review added");
     }
 
-    public void updateReviewTitle(Review review, String )
+    public void updateReviewTitle(Review review, String newTitle) throws SQLException {
+        String sql = "UPDATE review SET title = '" + newTitle + "' WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setTitle(newTitle);
+        System.out.println("Review " + review.getId() + " title changed");
+    }
+
+    public void updateReviewBody(Review review, String newBody) throws SQLException {
+        String sql = "UPDATE review SET body = '" + newBody + "' WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setBody(newBody);
+        System.out.println("Review " + review.getId() + " body changed");
+    }
+
+    public void updateReviewPublicationTimestamp(Review review, Timestamp publicationTimestamp) throws SQLException {
+        String sql = "UPDATE review SET publication_timestamp = '" + publicationTimestamp.toString() + "' WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setPublicationTimestamp(publicationTimestamp);
+        System.out.println("Review " + review.getId() + " publication timestamp changed");
+    }
+
+    public void updateReviewLastChangeTimestamp(Review review, Timestamp lastChangeTimestamp) throws SQLException {
+        String sql = "UPDATE review SET last_change_timestamp = '" + lastChangeTimestamp.toString() + "' WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setLastChangeTimestamp(lastChangeTimestamp);
+        System.out.println("Review " + review.getId() + " last change timestamp changed");
+    }
+
+    public void updateReviewRating(Review review, int newRating) throws SQLException {
+        String sql = "UPDATE review SET rating = " + newRating + " WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setRating(newRating);
+        System.out.println("Review " + review.getId() + " rating changed");
+    }
+
+    public void updateReviewAccount(Review review, Account account) throws SQLException {
+        String sql = "UPDATE review SET account_id = " + account.getId() + " WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setAccount(account);
+        System.out.println("Review " + review.getId() + " account changed");
+    }
+
+    public void updateReviewCleaning(Review review, Cleaning cleaning) throws SQLException {
+        String sql = "UPDATE review SET cleaning_id = " + cleaning.getId() + " WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        review.setCleaning(cleaning);
+        System.out.println("Review " + review.getId() + " cleaning changed");
+    }
+
+    public void deleteReview(Review review) throws SQLException {
+        String sql = "DELETE FROM review WHERE review_id = " + review.getId();
+        executeStatement(sql);
+        System.out.println("Review " + review.getId() + " deleted");
+    }
+
+    public Review selectReview(int reviewId) throws SQLException {
+        Review review = null;
+
+        String sql = "SELECT * FROM review WHERE review_id = " + reviewId;
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.first()) {
+            String title = rs.getString("title");
+            String body = rs.getString("body");
+            Timestamp publicationTimestamp = rs.getTimestamp("publication_timestamp");
+            Timestamp lastChangeTimestamp = rs.getTimestamp("last_change_timestamp");
+            int rating = rs.getInt("rating");
+            Account account = selectAccount(rs.getInt("account_id"));
+            Cleaning cleaning = selectCleaning(rs.getInt("cleaning_id"));
+            review = new Review(reviewId, title, body, publicationTimestamp, lastChangeTimestamp, rating, account, cleaning);
+        }
+
+        rs.close();
+        statement.close();
+        return review;
+    }
+
+    public ArrayList<Review> selectReviews() throws SQLException {
+        ArrayList<Review> reviews = new ArrayList<Review>();
+
+        String sql = "SELECT * FROM review";
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next()) {
+            int id = rs.getInt("review_id");
+            String title = rs.getString("title");
+            String body = rs.getString("body");
+            Timestamp publicationTimestamp = rs.getTimestamp("publication_timestamp");
+            Timestamp lastChangeTimestamp = rs.getTimestamp("last_change_timestamp");
+            int rating = rs.getInt("rating");
+            Account account = selectAccount(rs.getInt("account_id"));
+            Cleaning cleaning = selectCleaning(rs.getInt("cleaning_id"));
+            reviews.add(new Review(id, title, body, publicationTimestamp, lastChangeTimestamp, rating, account, cleaning));
+        }
+
+        rs.close();
+        statement.close();
+        return reviews;
+    }
 
     // SERVICE
 
