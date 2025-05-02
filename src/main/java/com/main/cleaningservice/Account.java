@@ -6,11 +6,14 @@ public class Account {
     private String password;
     private AccountType type;
 
-    public Account(int id, String login, String password, AccountType type) {
+    private String displayName;
+
+    public Account(int id, String login, String password, AccountType type, String displayName) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.type = type;
+        this.displayName = displayName;
     }
 
     public int getId() {
@@ -43,5 +46,13 @@ public class Account {
 
     public void setType(AccountType type) {
         this.type = type;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

@@ -23,8 +23,8 @@ public class DBAdapter {
 
     // ACCOUNT
 
-    public void insertAccount(String login, String password, AccountType accountType) throws SQLException {
-        String sql = "INSERT INTO account(login, password, account_type_id) VALUES ('" + login + "', '" + password + "', " + accountType.getId() + ")";
+    public void insertAccount(String login, String password, AccountType accountType, String displayName) throws SQLException {
+        String sql = "INSERT INTO account(login, password, account_type_id, display_name) VALUES ('" + login + "', '" + password + "', " + accountType.getId() + ", '" + displayName + "')";
         executeStatement(sql);
         System.out.println("Account added");
     }
@@ -46,7 +46,14 @@ public class DBAdapter {
         String sql = "UPDATE account SET account_type_id = " + accountType.getId() + " WHERE account_id = " + account.getId();
         executeStatement(sql);
         account.setType(accountType);
-        System.out.println("Account " + account.getId() + " type changed to " + accountType.getId());
+        System.out.println("Account " + account.getId() + " type changed");
+    }
+
+    public void updateAccountDisplayName(Account account, String newDisplayName) throws SQLException {
+        String sql = "UPDATE account SET display_name = '" + newDisplayName + "' WHERE account_id = " + account.getId();
+        executeStatement(sql);
+        account.setDisplayName(newDisplayName);
+        System.out.println("Account " + account.getId() + " display name changed");
     }
 
     public void deleteAccount(Account account) throws SQLException {
@@ -67,7 +74,8 @@ public class DBAdapter {
             String login = rs.getString("login");
             String password = rs.getString("password");
             AccountType accountType = selectAccountType(rs.getInt("account_type_id"));
-            account = new Account(accountId, login, password, accountType);
+            String displayName = rs.getString("display_name");
+            account = new Account(accountId, login, password, accountType, displayName);
         }
 
         rs.close();
@@ -88,7 +96,8 @@ public class DBAdapter {
             String login = rs.getString("login");
             String password = rs.getString("password");
             AccountType accountType = selectAccountType(rs.getInt("account_type_id"));
-            accounts.add(new Account(id, login, password, accountType));
+            String displayName = rs.getString("display_name");
+            accounts.add(new Account(id, login, password, accountType, displayName));
         }
 
         rs.close();
@@ -955,7 +964,7 @@ public class DBAdapter {
     // REVIEW
 
     public void insertReview(String title, String body, Timestamp publicationTimestamp, Timestamp lastChangeTimestamp, int rating, Account account, Cleaning cleaning) throws SQLException {
-
+        String sql = "INSERT INTO review(title, body, publication_timestamp, last_change_timestamp, rating, cleaning_id, "
     }
 
     // SERVICE
