@@ -5,7 +5,6 @@ public class Account {
     private String login;
     private String password;
     private AccountType type;
-
     private String displayName;
 
     public Account(int id, String login, String password, AccountType type, String displayName) {

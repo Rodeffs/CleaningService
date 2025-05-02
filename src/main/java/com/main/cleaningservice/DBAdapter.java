@@ -964,8 +964,12 @@ public class DBAdapter {
     // REVIEW
 
     public void insertReview(String title, String body, Timestamp publicationTimestamp, Timestamp lastChangeTimestamp, int rating, Account account, Cleaning cleaning) throws SQLException {
-        String sql = "INSERT INTO review(title, body, publication_timestamp, last_change_timestamp, rating, cleaning_id, "
+        String sql = "INSERT INTO review(title, body, publication_timestamp, last_change_timestamp, rating, cleaning_id, account_id) VALUES ('" + title + "', '" + body + "', '" + publicationTimestamp.toString() + "', '" + lastChangeTimestamp + "', " + rating + ", " + cleaning.getId() + ", " + account.getId() + ")";
+        executeStatement(sql);
+        System.out.println("Review added");
     }
+
+    public void updateReviewTitle(Review review, String )
 
     // SERVICE
 
