@@ -10,6 +10,17 @@ public class Client {
     private String email;
     private String phone;
 
+    public Client() {
+        id = -1;
+        name = null;
+        surname = null;
+        secondName = null;
+        type = null;
+        account = null;
+        email = null;
+        phone = null;
+    }
+
     public Client(int id, String name, String surname, String secondName, ClientType type, Account account, String email, String phone) {
         this.id = id;
         this.name = name;
@@ -83,5 +94,27 @@ public class Client {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public void clear() {
+        id = -1;
+        name = null;
+        surname = null;
+        secondName = null;
+        type = null;
+        account = null;
+        email = null;
+        phone = null;
+    }
+
+    public void setClient(Client otherClient) {
+        id = otherClient.getId();
+        name = otherClient.getName();
+        surname = otherClient.getSurname();
+        secondName = otherClient.getSecondName();
+        type = otherClient.getType();
+        account = otherClient.getAccount();
+        email = otherClient.getEmail();
+        phone = otherClient.getPhone();
     }
 }

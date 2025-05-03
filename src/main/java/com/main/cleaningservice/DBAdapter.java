@@ -38,6 +38,7 @@ public class DBAdapter {
     public void updateAccountLogin(Account account, String newLogin) throws SQLException {
         String sql = "UPDATE account SET login = '" + newLogin + "' WHERE account_id = " + account.getId();
         executeStatement(sql);
+        account.setLogin(newLogin);
         System.out.println("Account " + account.getId() + " login changed");
     }
 
@@ -341,24 +342,28 @@ public class DBAdapter {
     public void updateCleanerName(Cleaner cleaner, String newName) throws SQLException {
         String sql = "UPDATE cleaner SET cleaner_name = '" + newName + "' WHERE cleaner_id = " + cleaner.getId();
         executeStatement(sql);
+        cleaner.setName(newName);
         System.out.println("Cleaner " + cleaner.getId() + " name changed");
     }
 
     public void updateCleanerSurname(Cleaner cleaner, String newSurname) throws SQLException {
         String sql = "UPDATE cleaner SET cleaner_surname = '" + newSurname + "' WHERE cleaner_id = " + cleaner.getId();
         executeStatement(sql);
+        cleaner.setSurname(newSurname);
         System.out.println("Cleaner " + cleaner.getId() + " surname changed");
     }
 
     public void updateCleanerSecondName(Cleaner cleaner, String newSecondName) throws SQLException {
         String sql = "UPDATE cleaner SET cleaner_second_name = '" + newSecondName + "' WHERE cleaner_id = " + cleaner.getId();
         executeStatement(sql);
+        cleaner.setSecondName(newSecondName);
         System.out.println("Cleaner " + cleaner.getId() + " second name changed");
     }
 
     public void updateCleanerBirthday(Cleaner cleaner, Date newBirthday) throws SQLException {
         String sql = "UPDATE cleaner SET cleaner_birthday = '" + newBirthday.toString() + "' WHERE cleaner_id = " + cleaner.getId();
         executeStatement(sql);
+        cleaner.setBirthday(newBirthday);
         System.out.println("Cleaner " + cleaner.getId() + " birthday changed");
     }
 
@@ -610,42 +615,49 @@ public class DBAdapter {
     public void updateClientName(Client client, String newName) throws SQLException {
         String sql = "UPDATE client SET client_name = '" + newName + "' WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setName(newName);
         System.out.println("Client " + client.getId() + " name updated");
     }
 
     public void updateClientSurname(Client client, String newSurname) throws SQLException {
         String sql = "UPDATE client SET client_surname = '" + newSurname + "' WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setSurname(newSurname);
         System.out.println("Client " + client.getId() + " surname updated");
     }
 
     public void updateClientSecondName(Client client, String newSecondName) throws SQLException {
         String sql = "UPDATE client SET client_second_name = '" + newSecondName + "' WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setSecondName(newSecondName);
         System.out.println("Client " + client.getId() + " second name updated");
     }
 
     public void updateClientType(Client client, ClientType clientType) throws SQLException {
         String sql = "UPDATE client SET client_type_id = " + clientType.getId() + " WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setType(clientType);
         System.out.println("Client " + client.getId() + " type updated");
     }
 
     public void updateClientAccount(Client client, Account account) throws SQLException {
         String sql = "UPDATE client SET account_id = " + account.getId() + " WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setAccount(account);
         System.out.println("Client " + client.getId() + " account updated");
     }
 
     public void updateClientEmail(Client client, String newEmail) throws SQLException {
         String sql = "UPDATE client SET client_email = '" + newEmail + "' WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setEmail(newEmail);
         System.out.println("Client " + client.getId() + " email updated");
     }
 
     public void updateClientPhone(Client client, String newPhone) throws SQLException {
         String sql = "UPDATE client SET client_phone = '" + newPhone + "' WHERE client_id = " + client.getId();
         executeStatement(sql);
+        client.setPhone(newPhone);
         System.out.println("Client " + client.getId() + " phone updated");
     }
 

@@ -18,22 +18,25 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class UserAccountScreenBuilder implements Builder<Region> {
-    Account account;
-    Client client;
-    Runnable returnToAuthenticationScreen;
-    DBAdapter adapter;
-    BooleanProperty isLoggedIn;
-    BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
+    private final Account account;
+    private final Client client;
+    private final DBAdapter adapter;
+    private final BooleanProperty isLoggedIn;
+    private final BooleanProperty isClient;
+    private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
 
-    public UserAccountScreenBuilder(Account account, BooleanProperty isLoggedIn, Client client, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+    public UserAccountScreenBuilder(Account account, BooleanProperty isLoggedIn, Client client, BooleanProperty isClient, DBAdapter adapter) {
         this.account = account;
         this.client = client;
+        this.isClient = isClient;
         this.isLoggedIn = isLoggedIn;
-        this.returnToAuthenticationScreen = returnToAuthenticationScreen;
         this.adapter = adapter;
     }
 
-    private void updateAllInfo(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+    private void updateInfo(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+        if (!isLoggedIn.getValue() || !isClient.getValue())
+            return;
+
         String newLogin = loginInput.getText();
 
         try {
@@ -86,7 +89,10 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         }
     }
 
-    private void resetAllInfo(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+    private void displayInfo(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+        if (!isLoggedIn.getValue() || !isClient.getValue())
+            return;
+
         loginInput.setText(account.getLogin());
         passwordInput.setText(account.getPassword());
         displayNameInput.setText(account.getDisplayName());
@@ -98,9 +104,9 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         phoneInput.setText(client.getPhone());
     }
 
-    private void displayInfo(GridPane window) {
-        if (!isLoggedIn.getValue() || client == null)
-            return;
+    @Override
+    public Region build() {
+        GridPane window = new GridPane();
 
         window.setAlignment(Pos.CENTER);
         window.setHgap(10);
@@ -181,10 +187,8 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         TextField phoneInput = new TextField();
         window.add(phoneInput, 1, 9);
 
-        resetAllInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput);
-
         Button saveButton = new Button("Save Changes");
-        saveButton.setOnAction(e -> updateAllInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+        saveButton.setOnAction(e -> updateInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
 
         HBox saveBox = new HBox(10);
         saveBox.setAlignment(Pos.BOTTOM_LEFT);
@@ -192,18 +196,15 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         window.add(saveBox,0, 10);
 
         Button resetButton = new Button("Reset Changes");
-        resetButton.setOnAction(e -> resetAllInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+        resetButton.setOnAction(e -> displayInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
 
         HBox resetBox = new HBox(10);
         resetBox.setAlignment(Pos.BOTTOM_RIGHT);
         resetBox.getChildren().add(resetButton);
         window.add(resetBox, 1, 10);
-    }
 
-    @Override
-    public Region build() {
-        GridPane window = new GridPane();
-        isLoggedIn.addListener((ob, oldVal, newVal) -> displayInfo(window));
+        isLoggedIn.addListener((ob, oldVal, newVal) -> displayInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+
         return new ScrollPane(window);
     }
 

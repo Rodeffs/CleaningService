@@ -5,13 +5,11 @@ import javafx.scene.layout.Region;
 import javafx.util.Builder;
 
 public class UserReviewsScreenBuilder implements Builder<Region> {
-    Account account;
-    Runnable returnToAuthenticationScreen;
-    DBAdapter adapter;
+    private final Account account;
+    private final DBAdapter adapter;
 
-    public UserReviewsScreenBuilder(Account account, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+    public UserReviewsScreenBuilder(Account account, DBAdapter adapter) {
         this.account = account;
-        this.returnToAuthenticationScreen = returnToAuthenticationScreen;
         this.adapter = adapter;
     }
 

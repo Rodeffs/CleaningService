@@ -16,13 +16,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class RegistrationScreenBuilder implements Builder<Region> {
-    Account account;
-    Runnable exitAuthenticationScreen;
-    Runnable switchToLoginScreen;
-    DBAdapter adapter;
-    BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
-    BooleanProperty incorrectInputVisible = new SimpleBooleanProperty(false);
-    BooleanProperty isLoggedIn;
+    private final Account account;
+    private final Runnable exitAuthenticationScreen;
+    private final Runnable switchToLoginScreen;
+    private final DBAdapter adapter;
+    private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty incorrectInputVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty isLoggedIn;
 
     public RegistrationScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchToLoginScreen) {
         this.account = account;
@@ -32,7 +32,17 @@ public class RegistrationScreenBuilder implements Builder<Region> {
         this.switchToLoginScreen = switchToLoginScreen;
     }
 
-    private void createAccountClient(String login, String password, String displayName, String name, String surname, String secondName, String clientType, String email, String phone) {
+    private void createAccountClient(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+        String login = loginInput.getText();
+        String password = passwordInput.getText();
+        String displayName = displayNameInput.getText();
+        String name = nameInput.getText();
+        String surname = surnameInput.getText();
+        String secondName = secondNameInput.getText();
+        String clientType = clientTypeInput.getValue();
+        String email = emailInput.getText();
+        String phone = phoneInput.getText();
+
         try {
             if (adapter.selectAccount(login) != null) {
                 incorrectLoginVisible.set(true);
@@ -42,7 +52,7 @@ public class RegistrationScreenBuilder implements Builder<Region> {
             else {
                 incorrectLoginVisible.set(false);
 
-                if (login.isEmpty() || password.isEmpty() || displayName.isEmpty() || name.isEmpty() || surname.isEmpty() || secondName.isEmpty() || clientType.isEmpty() || email.isEmpty() || phone.isEmpty())
+                if (login.isEmpty() || password.isEmpty() || displayName.isEmpty() || name.isEmpty() || surname.isEmpty() || secondName.isEmpty() || clientType.equals("Select Type") || email.isEmpty() || phone.isEmpty())
                     incorrectInputVisible.set(true);
 
                 else {
@@ -54,6 +64,18 @@ public class RegistrationScreenBuilder implements Builder<Region> {
                     ClientType type = adapter.selectClientType(clientType);
                     adapter.insertClient(name, surname, secondName, type, account, email, phone);
                     isLoggedIn.set(true);
+
+                    loginInput.clear();
+                    passwordInput.clear();
+                    displayNameInput.clear();
+                    nameInput.clear();
+                    surnameInput.clear();
+                    secondNameInput.clear();
+                    clientTypeInput.setValue("Select Type");
+                    emailInput.clear();
+                    phoneInput.clear();
+
+                    switchToLoginScreen.run();
                     exitAuthenticationScreen.run();
                 }
             }
@@ -121,6 +143,7 @@ public class RegistrationScreenBuilder implements Builder<Region> {
         window.add(clientTypeLabel, 0, 7);
 
         ArrayList<String> clientTypes = new ArrayList<String>();
+        clientTypes.add("Select Type");
 
         try {
             for (ClientType clientType : adapter.selectClientTypes())
@@ -131,6 +154,7 @@ public class RegistrationScreenBuilder implements Builder<Region> {
         }
 
         ComboBox<String> clientTypeInput = new ComboBox<String>(FXCollections.observableArrayList(clientTypes));
+        clientTypeInput.setValue("Select Type");
         window.add(clientTypeInput, 1, 7);
 
         Label emailLabel = new Label("Email:");
@@ -146,7 +170,7 @@ public class RegistrationScreenBuilder implements Builder<Region> {
         window.add(phoneInput, 1, 9);
 
         Button registerButton = new Button("Register");
-        registerButton.setOnAction(e -> createAccountClient(loginInput.getText(), passwordInput.getText(), displayNameInput.getText(), nameInput.getText(), surnameInput.getText(), secondNameInput.getText(), clientTypeInput.getValue(), emailInput.getText(), phoneInput.getText()));
+        registerButton.setOnAction(e -> createAccountClient(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
 
         HBox registerBox = new HBox(10);
         registerBox.setAlignment(Pos.BOTTOM_LEFT);

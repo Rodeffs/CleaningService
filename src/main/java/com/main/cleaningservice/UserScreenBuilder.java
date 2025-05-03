@@ -12,15 +12,17 @@ import javafx.util.Builder;
 import java.sql.SQLException;
 
 public class UserScreenBuilder implements Builder<Region> {
-    Account account;
-    Client client;
-    Runnable returnToAuthenticationScreen;
-    DBAdapter adapter;
-    BooleanProperty isLoggedIn;
+    private final Account account;
+    private final BooleanProperty isLoggedIn;
+    private final Runnable returnToAuthenticationScreen;
+    private final DBAdapter adapter;
 
-    BooleanProperty accountInfoVisible = new SimpleBooleanProperty(false);
-    BooleanProperty yourCleaningsVisible = new SimpleBooleanProperty(true);
-    BooleanProperty yourReviewsVisible = new SimpleBooleanProperty(false);
+    private final Client client = new Client();
+    private final BooleanProperty isClient = new SimpleBooleanProperty(false);
+
+    private final BooleanProperty accountInfoVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty yourCleaningsVisible = new SimpleBooleanProperty(true);
+    private final BooleanProperty yourReviewsVisible = new SimpleBooleanProperty(false);
 
     public UserScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
         this.account = account;
@@ -31,15 +33,19 @@ public class UserScreenBuilder implements Builder<Region> {
 
     private void logOut() {
         isLoggedIn.set(false);
+        isClient.set(false);
+        account.clear();
+        client.clear();
         returnToAuthenticationScreen.run();
     }
 
-    private void setClient() {
+    private void logInClient() {
         if (!isLoggedIn.getValue())
             return;
 
         try {
-            client = adapter.selectClient(account);
+            client.setClient(adapter.selectClient(account));
+            isClient.set(true);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -54,7 +60,7 @@ public class UserScreenBuilder implements Builder<Region> {
 
     @Override
     public Region build() {
-        isLoggedIn.addListener((ob, oldVal, newVal) -> setClient());
+        isLoggedIn.addListener((ob, oldVal, newVal) -> logInClient());
 
         BorderPane window = new BorderPane();
 
@@ -71,21 +77,20 @@ public class UserScreenBuilder implements Builder<Region> {
         logOutButton.setOnAction(e -> logOut());
 
         HBox controlButtons = new HBox(0);
-        controlButtons.getChildren().addAll(accountInfoButton, yourCleaningsButton, yourReviewsButton, logOutButton);
+        controlButtons.getChildren().addAll(yourCleaningsButton, yourReviewsButton, accountInfoButton, logOutButton);
 
         window.setTop(controlButtons);
 
-        Region accountInfo = new UserAccountScreenBuilder(account, isLoggedIn, client, adapter, returnToAuthenticationScreen).build();
+        Region accountInfo = new UserAccountScreenBuilder(account, isLoggedIn, client, isClient, adapter).build();
         accountInfo.visibleProperty().bind(accountInfoVisible);
 
-        Region yourCleanings = new UserCleaningsScreenBuilder(account, adapter, returnToAuthenticationScreen).build();
+        Region yourCleanings = new UserCleaningsScreenBuilder(account, adapter).build();
         yourCleanings.visibleProperty().bind(yourCleaningsVisible);
 
-        Region yourReviews = new UserReviewsScreenBuilder(account, adapter, returnToAuthenticationScreen).build();
+        Region yourReviews = new UserReviewsScreenBuilder(account, adapter).build();
         yourReviews.visibleProperty().bind(yourReviewsVisible);
 
-        StackPane userScreens = new StackPane(accountInfo, yourCleanings, yourReviews);
-        window.setCenter(userScreens);
+        window.setCenter(new StackPane(accountInfo, yourCleanings, yourReviews));
 
         return window;
     }

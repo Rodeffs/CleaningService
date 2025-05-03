@@ -42,7 +42,7 @@ public class GlobalScreenBuilder implements Builder<Region> {
         BooleanProperty loginScreenActive = new SimpleBooleanProperty(true);
         BooleanProperty isLoggedIn = new SimpleBooleanProperty(false);
 
-        Account account = new Account(-1, null, null, null, null);
+        Account account = new Account();
 
         Region authenticationScreen = new AuthenticationScreenBuilder(account, isLoggedIn, adapter, () -> loginScreenActive.set(false)).build();
         Region mainGUI = new MainScreenBuilder(account, isLoggedIn, adapter, () -> loginScreenActive.set(true)).build();

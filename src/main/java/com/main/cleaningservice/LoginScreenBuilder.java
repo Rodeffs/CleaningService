@@ -14,12 +14,13 @@ import javafx.util.Builder;
 import java.sql.SQLException;
 
 public class LoginScreenBuilder implements Builder<Region> {
-    Account account;
-    Runnable exitAuthenticationScreen;
-    Runnable switchFromLoginScreen;
-    DBAdapter adapter;
-    BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
-    BooleanProperty isLoggedIn;
+    private final Account account;
+    private final BooleanProperty isLoggedIn;
+    private final DBAdapter adapter;
+    private final Runnable exitAuthenticationScreen;
+    private final Runnable switchFromLoginScreen;
+
+    private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
 
     public LoginScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchFromLoginScreen) {
         this.account = account;
@@ -29,14 +30,18 @@ public class LoginScreenBuilder implements Builder<Region> {
         this.switchFromLoginScreen = switchFromLoginScreen;
     }
 
-    private void login(String loginInput, String passwordInput) {
+    private void login(TextField loginInput, PasswordField passwordInput) {
         try {
-            Account loginAccount = adapter.selectAccount(loginInput);
+            Account loginAccount = adapter.selectAccount(loginInput.getText());
 
-            if ((loginAccount != null) && passwordInput.equals(loginAccount.getPassword())) {
+            if ((loginAccount != null) && passwordInput.getText().equals(loginAccount.getPassword())) {
                 account.setAccount(loginAccount);
                 isLoggedIn.set(true);
+
+                loginInput.clear();
+                passwordInput.clear();
                 incorrectLoginVisible.set(false);
+
                 exitAuthenticationScreen.run();
             }
             else
@@ -72,7 +77,7 @@ public class LoginScreenBuilder implements Builder<Region> {
         window.add(passwordInput, 1, 2);
 
         Button logInButton = new Button("Log In");
-        logInButton.setOnAction(e -> login(loginInput.getText(), passwordInput.getText()));
+        logInButton.setOnAction(e -> login(loginInput, passwordInput));
 
         HBox logInBox = new HBox(10);
         logInBox.setAlignment(Pos.BOTTOM_LEFT);

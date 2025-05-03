@@ -33,11 +33,11 @@ public class Cleaner {
         this.name = name;
     }
 
-    public String getSecond_name() {
+    public String getSecondName() {
         return secondName;
     }
 
-    public void setSecond_name(String secondName) {
+    public void setSecondName(String secondName) {
         this.secondName = secondName;
     }
 
