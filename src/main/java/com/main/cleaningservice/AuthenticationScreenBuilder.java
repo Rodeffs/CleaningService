@@ -9,11 +9,13 @@ import javafx.util.Builder;
 public class AuthenticationScreenBuilder implements Builder<Region> {
     Account account;
     Runnable exitAuthenticationScreen;
+    BooleanProperty isLoggedIn;
     DBAdapter adapter;
 
-    public AuthenticationScreenBuilder(Account account, DBAdapter adapter, Runnable exitAuthenticationScreen) {
+    public AuthenticationScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen) {
         this.account = account;
         this.adapter = adapter;
+        this.isLoggedIn = isLoggedIn;
         this.exitAuthenticationScreen = exitAuthenticationScreen;
     }
 
@@ -23,8 +25,8 @@ public class AuthenticationScreenBuilder implements Builder<Region> {
 
         BooleanProperty loginScreenVisible = new SimpleBooleanProperty(true);
 
-        Region loginWindow = new LoginScreenBuilder(account, adapter, exitAuthenticationScreen, () -> loginScreenVisible.set(false)).build();
-        Region registrationWindow = new RegistrationScreenBuilder(account, adapter, exitAuthenticationScreen, () -> loginScreenVisible.set(true)).build();
+        Region loginWindow = new LoginScreenBuilder(account, isLoggedIn, adapter, exitAuthenticationScreen, () -> loginScreenVisible.set(false)).build();
+        Region registrationWindow = new RegistrationScreenBuilder(account, isLoggedIn, adapter, exitAuthenticationScreen, () -> loginScreenVisible.set(true)).build();
 
         loginWindow.visibleProperty().bind(loginScreenVisible);
         registrationWindow.visibleProperty().bind(loginScreenVisible.not());

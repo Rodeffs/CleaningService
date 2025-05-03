@@ -1,17 +1,19 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
-import javafx.scene.text.Text;
 import javafx.util.Builder;
 
-public class MainGUIBuilder implements Builder<Region> {
+public class AdminScreenBuilder implements Builder<Region> {
     Account account;
     Runnable returnToAuthenticationScreen;
     DBAdapter adapter;
+    BooleanProperty isLoggedIn;
 
-    public MainGUIBuilder(Account account, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+    public AdminScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
         this.account = account;
+        this.isLoggedIn = isLoggedIn;
         this.returnToAuthenticationScreen = returnToAuthenticationScreen;
         this.adapter = adapter;
     }
@@ -20,8 +22,7 @@ public class MainGUIBuilder implements Builder<Region> {
     public Region build() {
         BorderPane window = new BorderPane();
 
-        Text test = new Text("this is just sample text");
-        window.setCenter(test);
+        //isLoggedIn.addListener((ob, oldVal, newVal) -> setText(test));
 
         return window;
     }

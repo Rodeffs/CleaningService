@@ -22,9 +22,11 @@ public class RegistrationScreenBuilder implements Builder<Region> {
     DBAdapter adapter;
     BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
     BooleanProperty incorrectInputVisible = new SimpleBooleanProperty(false);
+    BooleanProperty isLoggedIn;
 
-    public RegistrationScreenBuilder(Account account, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchToLoginScreen) {
+    public RegistrationScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchToLoginScreen) {
         this.account = account;
+        this.isLoggedIn = isLoggedIn;
         this.adapter = adapter;
         this.exitAuthenticationScreen = exitAuthenticationScreen;
         this.switchToLoginScreen = switchToLoginScreen;
@@ -32,8 +34,10 @@ public class RegistrationScreenBuilder implements Builder<Region> {
 
     private void createAccountClient(String login, String password, String displayName, String name, String surname, String secondName, String clientType, String email, String phone) {
         try {
-            if (adapter.selectAccount(login) != null)
+            if (adapter.selectAccount(login) != null) {
                 incorrectLoginVisible.set(true);
+                incorrectInputVisible.set(false);
+            }
 
             else {
                 incorrectLoginVisible.set(false);
@@ -45,11 +49,11 @@ public class RegistrationScreenBuilder implements Builder<Region> {
                     incorrectInputVisible.set(false);
 
                     adapter.insertAccount(login, password, displayName);
-                    account = adapter.selectAccount(login);
+                    account.setAccount(adapter.selectAccount(login));
 
                     ClientType type = adapter.selectClientType(clientType);
                     adapter.insertClient(name, surname, secondName, type, account, email, phone);
-
+                    isLoggedIn.set(true);
                     exitAuthenticationScreen.run();
                 }
             }

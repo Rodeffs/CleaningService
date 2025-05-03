@@ -10,13 +10,11 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Builder;
 
-public class GlobalLayoutBuilder implements Builder<Region> {
-    Account currentAccount;
-    DBAdapter adapter = new DBAdapter();
-
+public class GlobalScreenBuilder implements Builder<Region> {
     @Override
     public Region build() {
-        BorderPane window = new BorderPane();
+        DBAdapter adapter = new DBAdapter();
+        StackPane window = new StackPane();
 
         // Error handling
 
@@ -35,21 +33,24 @@ public class GlobalLayoutBuilder implements Builder<Region> {
             smallErrorText.setEditable(false);
             errorBox.getChildren().add(smallErrorText);
 
-            window.setCenter(errorBox);
+            window.getChildren().add(errorBox);
             return window;
         }
 
-        // Swapping between login screen and main GUI
+        // Swapping between login screen and main screen
 
         BooleanProperty loginScreenActive = new SimpleBooleanProperty(true);
+        BooleanProperty isLoggedIn = new SimpleBooleanProperty(false);
 
-        Region authenticationScreen = new AuthenticationScreenBuilder(currentAccount, adapter, () -> loginScreenActive.set(false)).build();
-        Region mainGUI = new MainGUIBuilder(currentAccount, adapter, () -> loginScreenActive.set(true)).build();
+        Account account = new Account(-1, null, null, null, null);
+
+        Region authenticationScreen = new AuthenticationScreenBuilder(account, isLoggedIn, adapter, () -> loginScreenActive.set(false)).build();
+        Region mainGUI = new MainScreenBuilder(account, isLoggedIn, adapter, () -> loginScreenActive.set(true)).build();
 
         authenticationScreen.visibleProperty().bind(loginScreenActive);
         mainGUI.visibleProperty().bind(loginScreenActive.not());
 
-        window.setCenter(new StackPane(authenticationScreen, mainGUI));
+        window.getChildren().addAll(authenticationScreen, mainGUI);
         return window;
     }
 

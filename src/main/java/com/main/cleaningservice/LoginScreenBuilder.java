@@ -19,9 +19,11 @@ public class LoginScreenBuilder implements Builder<Region> {
     Runnable switchFromLoginScreen;
     DBAdapter adapter;
     BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
+    BooleanProperty isLoggedIn;
 
-    public LoginScreenBuilder(Account account, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchFromLoginScreen) {
+    public LoginScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchFromLoginScreen) {
         this.account = account;
+        this.isLoggedIn = isLoggedIn;
         this.adapter = adapter;
         this.exitAuthenticationScreen = exitAuthenticationScreen;
         this.switchFromLoginScreen = switchFromLoginScreen;
@@ -32,7 +34,8 @@ public class LoginScreenBuilder implements Builder<Region> {
             Account loginAccount = adapter.selectAccount(loginInput);
 
             if ((loginAccount != null) && passwordInput.equals(loginAccount.getPassword())) {
-                account = loginAccount;
+                account.setAccount(loginAccount);
+                isLoggedIn.set(true);
                 incorrectLoginVisible.set(false);
                 exitAuthenticationScreen.run();
             }
