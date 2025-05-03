@@ -678,6 +678,29 @@ public class DBAdapter {
         return client;
     }
 
+    public Client selectClient(Account account) throws SQLException {
+        Client client = null;
+
+        String sql = "SELECT * FROM client WHERE account_id = " + account.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.next()) {
+            int id = rs.getInt("client_id");
+            String name = rs.getString("client_name");
+            String surname = rs.getString("client_surname");
+            String secondName = rs.getString("client_second_name");
+            ClientType clientType = selectClientType(rs.getInt("client_type_id"));
+            String email = rs.getString("client_email");
+            String phone = rs.getString("client_phone");
+            client = new Client(id, name, surname, secondName, clientType, account, email, phone);
+        }
+
+        rs.close();
+        statement.close();
+        return client;
+    }
+
     public ArrayList<Client> selectClients() throws SQLException {
         ArrayList<Client> clients = new ArrayList<Client>();
 

@@ -29,4 +29,14 @@ public class ClientType {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if ((obj == null) || !(obj instanceof ClientType))
+            return false;
+
+        ClientType otherType = (ClientType)obj;
+
+        return name.equals(otherType.getName());
+    }
 }
