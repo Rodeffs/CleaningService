@@ -414,6 +414,21 @@ public class DBAdapter {
         return cleaners;
     }
 
+    public ArrayList<Cleaner> selectCleaners(Cleaning cleaning) throws SQLException {
+        ArrayList<Cleaner> cleaners = new ArrayList<Cleaner>();
+
+        String sql = "SELECT cleaner_id FROM cleaning_cleaners WHERE cleaning_id = " + cleaning.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next())
+            cleaners.add(selectCleaner(rs.getInt(1)));
+
+        rs.close();
+        statement.close();
+        return cleaners;
+    }
+
     // CLEANING
 
     public void insertCleaning(Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) throws SQLException {
@@ -506,34 +521,25 @@ public class DBAdapter {
         return cleanings;
     }
 
-    public ArrayList<Cleaner> selectCleaningCleaners(Cleaning cleaning) throws SQLException {
-        ArrayList<Cleaner> cleaners = new ArrayList<Cleaner>();
+    public ArrayList<Cleaning> selectCleanings(Client client) throws SQLException {
+        ArrayList<Cleaning> cleanings = new ArrayList<Cleaning>();
 
-        String sql = "SELECT cleaner_id FROM cleaning_cleaners WHERE cleaning_id = " + cleaning.getId();
+        String sql = "SELECT * FROM cleaning WHERE client_id = " + client.getId();
         Statement statement = conn.createStatement();
         ResultSet rs = statement.executeQuery(sql);
 
-        while (rs.next())
-            cleaners.add(selectCleaner(rs.getInt(1)));
+        while (rs.next()) {
+            int id = rs.getInt("cleaning_id");
+            Address address = selectAddress(rs.getInt("address_id"));
+            PlaceType placeType = selectPlaceType(rs.getInt("place_type_id"));
+            CleaningType cleaningType = selectCleaningType(rs.getInt("cleaning_type_id"));
+            Timestamp timestamp = rs.getTimestamp("time_date");
+            cleanings.add(new Cleaning(id, address, placeType, cleaningType, timestamp, client));
+        }
 
         rs.close();
         statement.close();
-        return cleaners;
-    }
-
-    public ArrayList<Service> selectCleaningServices(Cleaning cleaning) throws SQLException {
-        ArrayList<Service> services = new ArrayList<Service>();
-
-        String sql = "SELECT cleaner_id FROM cleaning_services WHERE cleaning_id = " + cleaning.getId();
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(sql);
-
-        while (rs.next())
-            services.add(selectService(rs.getInt(1)));
-
-        rs.close();
-        statement.close();
-        return services;
+        return cleanings;
     }
 
     public void calculateTotalPrice(Cleaning cleaning) throws SQLException { // using premade procedure in Postgres to not blow my brains out
@@ -1088,6 +1094,21 @@ public class DBAdapter {
             double price = rs.getDouble("service_price");
             services.add(new Service(id, name, description, price));
         }
+
+        rs.close();
+        statement.close();
+        return services;
+    }
+
+    public ArrayList<Service> selectServices(Cleaning cleaning) throws SQLException {
+        ArrayList<Service> services = new ArrayList<Service>();
+
+        String sql = "SELECT cleaner_id FROM cleaning_services WHERE cleaning_id = " + cleaning.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next())
+            services.add(selectService(rs.getInt(1)));
 
         rs.close();
         statement.close();

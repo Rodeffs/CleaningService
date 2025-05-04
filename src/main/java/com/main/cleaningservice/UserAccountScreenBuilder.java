@@ -23,6 +23,7 @@ public class UserAccountScreenBuilder implements Builder<Region> {
     private final DBAdapter adapter;
     private final BooleanProperty isLoggedIn;
     private final BooleanProperty isClient;
+
     private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
 
     public UserAccountScreenBuilder(Account account, BooleanProperty isLoggedIn, Client client, BooleanProperty isClient, DBAdapter adapter) {
@@ -203,7 +204,7 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         resetBox.getChildren().add(resetButton);
         window.add(resetBox, 1, 10);
 
-        isLoggedIn.addListener((ob, oldVal, newVal) -> displayInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+        isClient.addListener((ob, oldVal, newVal) -> displayInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
 
         return new ScrollPane(window);
     }

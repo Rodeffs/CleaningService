@@ -64,4 +64,9 @@ public class Address {
     public void setUnitNumber(int unitNumber) {
         this.unitNumber = unitNumber;
     }
+
+    @Override
+    public String toString() {
+        return street.getCity().getCountry().getName() + "\n" + street.getCity().getName() + "\n" + street.getName() + ", " + buildingNumber + "\nEntrance " + entranceNumber + "\nFloor " + floorNumber + "\nUnit " + unitNumber;
+    }
 }

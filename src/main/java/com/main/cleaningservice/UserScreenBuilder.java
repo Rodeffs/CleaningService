@@ -84,7 +84,7 @@ public class UserScreenBuilder implements Builder<Region> {
         Region accountInfo = new UserAccountScreenBuilder(account, isLoggedIn, client, isClient, adapter).build();
         accountInfo.visibleProperty().bind(accountInfoVisible);
 
-        Region yourCleanings = new UserCleaningsScreenBuilder(account, adapter).build();
+        Region yourCleanings = new UserCleaningsScreenBuilder(account, isLoggedIn, client, isClient, adapter).build();
         yourCleanings.visibleProperty().bind(yourCleaningsVisible);
 
         Region yourReviews = new UserReviewsScreenBuilder(account, adapter).build();
