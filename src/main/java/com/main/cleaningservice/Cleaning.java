@@ -8,9 +8,20 @@ public class Cleaning {
     private PlaceType placeType;
     private CleaningType cleaningType;
     private Timestamp timestamp;
-    private double totalPrice = 0.0;
-    private int cleanersAmount = 0;
+    private double totalPrice;
+    private int cleanersAmount;
     private Client client;
+
+    public Cleaning() {
+        id = -1;
+        address = null;
+        placeType = null;
+        cleaningType = null;
+        timestamp = null;
+        totalPrice = 0.0;
+        cleanersAmount = 0;
+        client = null;
+    }
 
     public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, double totalPrice, int cleanersAmount, Client client) {
         this.id = id;
@@ -23,12 +34,25 @@ public class Cleaning {
         this.client = client;
     }
 
+    public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, double totalPrice, Client client) {
+        this.id = id;
+        this.address = address;
+        this.placeType = placeType;
+        this.cleaningType = cleaningType;
+        this.timestamp = timestamp;
+        this.totalPrice = totalPrice;
+        this.cleanersAmount = 0;
+        this.client = client;
+    }
+
     public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) {
         this.id = id;
         this.address = address;
         this.placeType = placeType;
         this.cleaningType = cleaningType;
         this.timestamp = timestamp;
+        this.totalPrice = 0.0;
+        this.cleanersAmount = 0;
         this.client = client;
     }
 
@@ -94,5 +118,16 @@ public class Cleaning {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public void setCleaning(Cleaning otherCleaning) {
+        id = otherCleaning.getId();
+        address = otherCleaning.getAddress();
+        placeType = otherCleaning.getPlaceType();
+        cleaningType = otherCleaning.getCleaningType();
+        timestamp = otherCleaning.getTimestamp();
+        totalPrice = otherCleaning.getTotalPrice();
+        cleanersAmount = otherCleaning.getCleanersAmount();
+        client = otherCleaning.getClient();
     }
 }

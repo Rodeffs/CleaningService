@@ -19,22 +19,19 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class UserCleaningsScreenBuilder implements Builder<Region> {
-    private final Account account;
-    private final BooleanProperty isLoggedIn;
     private final DBAdapter adapter;
     private final Client client;
     private final BooleanProperty isClient;
 
-    private final TableView<Cleaning> cleaningsTable = new TableView<Cleaning>();
-    private final ObservableList<Cleaning> cleaningsList = FXCollections.observableArrayList();
+    private final TableView<Cleaning> cleaningsTable = new TableView<Cleaning>();  // the table, once set don't change
+    private final ObservableList<Cleaning> cleaningsList = FXCollections.observableArrayList();  // what's actually gonna be changed
+    private final Cleaning selectedCleaning = new Cleaning();
 
     private final BooleanProperty tableScreenVisible = new SimpleBooleanProperty(true);
     private final BooleanProperty tableAddScreenVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty tableEditScreenVisible = new SimpleBooleanProperty(false);
 
-    public UserCleaningsScreenBuilder(Account account, BooleanProperty isLoggedIn, Client client, BooleanProperty isClient, DBAdapter adapter) {
-        this.account = account;
-        this.isLoggedIn = isLoggedIn;
+    public UserCleaningsScreenBuilder(Client client, BooleanProperty isClient, DBAdapter adapter) {
         this.client = client;
         this.isClient = isClient;
         this.adapter = adapter;
@@ -42,6 +39,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
 
     private void setTableColumns() {
         TableColumn<Cleaning, Timestamp> dateTimeCol = new TableColumn<Cleaning, Timestamp>("Date & Time");
+        dateTimeCol.setPrefWidth(150);
 
         // The following code is used to sync the table contents with the Cleaning class
         // Whenever the value Timestamp of class Cleaning is updated it will use call()
@@ -54,6 +52,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         });
 
         TableColumn<Cleaning, Address> addressCol = new TableColumn<Cleaning, Address>("Address");
+        addressCol.setPrefWidth(170);
 
         addressCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, Address>, ObservableValue<Address>>() {
             public ObservableValue<Address> call(TableColumn.CellDataFeatures<Cleaning, Address> address) {
@@ -62,6 +61,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         });
 
         TableColumn<Cleaning, PlaceType> placeTypeCol = new TableColumn<Cleaning, PlaceType>("Place Type");
+        placeTypeCol.setPrefWidth(100);
 
         placeTypeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, PlaceType>, ObservableValue<PlaceType>>() {
             public ObservableValue<PlaceType> call(TableColumn.CellDataFeatures<Cleaning, PlaceType> placeType) {
@@ -70,6 +70,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         });
 
         TableColumn<Cleaning, CleaningType> cleaningTypeCol = new TableColumn<Cleaning, CleaningType>("Cleaning Type");
+        cleaningTypeCol.setPrefWidth(100);
 
         cleaningTypeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, CleaningType>, ObservableValue<CleaningType>>() {
             public ObservableValue<CleaningType> call(TableColumn.CellDataFeatures<Cleaning, CleaningType> cleaningType) {
@@ -78,6 +79,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         });
 
         TableColumn<Cleaning, Integer> cleanersAmountCol = new TableColumn<Cleaning, Integer>("Cleaners Amount");
+        cleanersAmountCol.setPrefWidth(120);
 
         cleanersAmountCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, Integer>, ObservableValue<Integer>>() {
             public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Cleaning, Integer> cleanersAmount) {
@@ -86,6 +88,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         });
 
         TableColumn<Cleaning, Double> totalPriceCol = new TableColumn<Cleaning, Double>("Total Price");
+        totalPriceCol.setPrefWidth(100);
 
         totalPriceCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, Double>, ObservableValue<Double>>() {
             public ObservableValue<Double> call(TableColumn.CellDataFeatures<Cleaning, Double> totalPrice) {
@@ -97,18 +100,46 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
     }
 
     private void setCleaningsList() {
-        if (!isLoggedIn.getValue() || !isClient.getValue()) {
+        if (!isClient.getValue()) {
             cleaningsList.clear();
             return;
         }
 
         try {
             ArrayList<Cleaning> cleanings = adapter.selectCleanings(client);
-            System.out.println(cleanings.size());
             cleaningsList.addAll(cleanings);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void setVisibility(UserCleaningsScreen selectedScreen) {
+        tableScreenVisible.set(selectedScreen == UserCleaningsScreen.TABLE);
+        tableAddScreenVisible.set(selectedScreen == UserCleaningsScreen.ADD);
+        tableEditScreenVisible.set(selectedScreen == UserCleaningsScreen.EDIT);
+    }
+
+    private void selectCleaningToEdit() {
+        Cleaning newSelected = cleaningsTable.getSelectionModel().getSelectedItem();
+
+        if (newSelected != null) {
+            selectedCleaning.setCleaning(newSelected);
+            setVisibility(UserCleaningsScreen.EDIT);
+        }
+    }
+
+    private void deleteSelected() {
+        Cleaning newSelected = cleaningsTable.getSelectionModel().getSelectedItem();
+
+        if (newSelected != null) {
+            try {
+                adapter.deleteCleaning(newSelected);
+                cleaningsList.remove(newSelected);
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -119,10 +150,10 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         ScrollPane tableScreen = new ScrollPane();
         tableScreen.visibleProperty().bind(tableScreenVisible);
 
-        ScrollPane tableAddScreen = new ScrollPane();
+        Region tableAddScreen = new UserCleaningsAddScreenBuilder(adapter, client, isClient, cleaningsList, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
         tableAddScreen.visibleProperty().bind(tableAddScreenVisible);
 
-        ScrollPane tableEditScreen = new ScrollPane();
+        Region tableEditScreen = new UserCleaningsEditScreenBuilder(adapter, client, isClient, selectedCleaning, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
         tableEditScreen.visibleProperty().bind(tableEditScreenVisible);
 
         window.setCenter(new StackPane(tableScreen, tableAddScreen, tableEditScreen));
@@ -134,10 +165,13 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         isClient.addListener(e -> setCleaningsList());
 
         Button orderButton = new Button("Order a cleaning");
+        orderButton.setOnAction(e -> setVisibility(UserCleaningsScreen.ADD));
 
         Button editButton = new Button("Edit ordered cleaning");
+        editButton.setOnAction(e -> selectCleaningToEdit());
 
         Button deleteButton = new Button("Cancel an order");
+        deleteButton.setOnAction(e -> deleteSelected());
 
         HBox controlButtons = new HBox(0);
         controlButtons.getChildren().addAll(orderButton, editButton, deleteButton);

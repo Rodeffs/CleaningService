@@ -21,7 +21,7 @@ public class DBAdapter {
         statement.close();
     }
 
-    // ACCOUNT
+    // ACCOUNT FUNCTIONS
 
     public void insertAccount(String login, String password, AccountType accountType, String displayName) throws SQLException {
         String sql = "INSERT INTO account(login, password, account_type_id, display_name) VALUES ('" + login + "', '" + password + "', " + accountType.getId() + ", '" + displayName + "')";
@@ -133,7 +133,7 @@ public class DBAdapter {
         return accounts;
     }
 
-    // ACCOUNT TYPE
+    // ACCOUNT TYPE FUNCTIONS
 
     public AccountType selectAccountType(int accountTypeId) throws SQLException {
         AccountType accountType = null;
@@ -172,7 +172,7 @@ public class DBAdapter {
         return accountTypes;
     }
 
-    // ADDRESS
+    // ADDRESS FUNCTIONS
 
     public void insertAddress(Street street, int buildingNumber, int entranceNumber, int floorNumber, int unitNumber) throws SQLException {
         String sql = "INSERT INTO address(street_id, building_number, entrance_number, floor_number, unit_number) VALUES (" + street.getId() + ", " + buildingNumber + ", " + entranceNumber + ", " + floorNumber + ", " + unitNumber + ")";
@@ -242,6 +242,23 @@ public class DBAdapter {
         return address;
     }
 
+    public Address selectAddress(Street street, int buildingNumber, int entranceNumber, int floorNumber, int unitNumber) throws SQLException {
+        Address address = null;
+
+        String sql = "SELECT * FROM address WHERE street_id = " + street.getId() + " AND building_number = " + buildingNumber + " AND entrance_number = " + entranceNumber + " AND floor_number = " + floorNumber + " AND unit_number = " + unitNumber;
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.next()) {
+            int id = rs.getInt("address_id");
+            address = new Address(id, street, buildingNumber, entranceNumber, floorNumber, unitNumber);
+        }
+
+        rs.close();
+        statement.close();
+        return address;
+    }
+
     public ArrayList<Address> selectAddresses() throws SQLException {
         ArrayList<Address> addresses = new ArrayList<Address>();
 
@@ -264,7 +281,7 @@ public class DBAdapter {
         return addresses;
     }
 
-    // CITY
+    // CITY FUNCTIONS
 
     public void insertCity(String name, Country country) throws SQLException {
         String sql = "INSERT INTO city(city_name, country_id) VALUES ('" + name + "', " + country.getId() + ")";
@@ -331,7 +348,26 @@ public class DBAdapter {
         return cities;
     }
 
-    // CLEANER
+    public ArrayList<City> selectCities(Country country) throws SQLException {
+        ArrayList<City> cities = new ArrayList<City>();
+
+        String sql = "SELECT * FROM city WHERE country_id = " + country.getId();
+
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next()) {
+            int id = rs.getInt("city_id");
+            String name = rs.getString("city_name");
+            cities.add(new City(id, country, name));
+        }
+
+        rs.close();
+        statement.close();
+        return cities;
+    }
+
+    // CLEANER FUNCTIONS
 
     public void insertCleaner(String name, String surname, String secondName, Date birthday) throws SQLException {
         String sql = "INSERT INTO cleaner(cleaner_name, cleaner_surname, cleaner_second_name, cleaner_birthday) VALUES ('" + name + "', '" + surname + "', '" + secondName + "', '" + birthday.toString() + "')";
@@ -429,10 +465,16 @@ public class DBAdapter {
         return cleaners;
     }
 
-    // CLEANING
+    // CLEANING FUNCTIONS
 
     public void insertCleaning(Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) throws SQLException {
         String sql = "INSERT INTO cleaning(address_id, place_type_id, cleaning_type_id, time_date, client_id) VALUES (" + address.getId() + ", " + placeType.getId() + ", " + cleaningType.getId() + ", '" + timestamp.toString() + "', " + client.getId() + ")";
+        executeStatement(sql);
+        System.out.println("Cleaning added");
+    }
+
+    public void insertCleaning(Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client, double totalPrice) throws SQLException {
+        String sql = "INSERT INTO cleaning(address_id, place_type_id, cleaning_type_id, time_date, client_id, total_price) VALUES (" + address.getId() + ", " + placeType.getId() + ", " + cleaningType.getId() + ", '" + timestamp.toString() + "', " + client.getId() + ", " + totalPrice + ")";
         executeStatement(sql);
         System.out.println("Cleaning added");
     }
@@ -499,6 +541,23 @@ public class DBAdapter {
         return cleaning;
     }
 
+    public Cleaning selectCleaning(Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) throws SQLException {
+        Cleaning cleaning = null;
+
+        String sql = "SELECT * FROM cleaning WHERE address_id = " + address.getId() + " AND place_type_id = " + placeType.getId() + " AND cleaning_type_id = " + cleaningType.getId() + " AND time_date = '" + timestamp.toString() + "' AND client_id = " + client.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        if (rs.next()) {
+            int id = rs.getInt("cleaning_id");
+            cleaning = new Cleaning(id, address, placeType, cleaningType, timestamp, client);
+        }
+
+        rs.close();
+        statement.close();
+        return cleaning;
+    }
+
     public ArrayList<Cleaning> selectCleanings() throws SQLException {
         ArrayList<Cleaning> cleanings = new ArrayList<Cleaning>();
 
@@ -542,19 +601,33 @@ public class DBAdapter {
         return cleanings;
     }
 
-    public void calculateTotalPrice(Cleaning cleaning) throws SQLException { // using premade procedure in Postgres to not blow my brains out
+    public void calculateTotalPrice(Cleaning cleaning) throws SQLException {
         String sql = "CALL calculate_total_price(" + cleaning.getId() + ")";
         executeStatement(sql);
         System.out.println("Cleaning " + cleaning.getId() + " total price calculated");
     }
 
-    public void calculateCleanersAmount(Cleaning cleaning) throws SQLException { // using premade procedure in Postgres to not blow my brains out
+    public void calculateCleanersAmount(Cleaning cleaning) throws SQLException {
         String sql = "CALL calculate_cleaners_amount(" + cleaning.getId() + ")";
         executeStatement(sql);
         System.out.println("Cleaning " + cleaning.getId() + " cleaners amount calculated");
     }
 
-    // CLEANING TYPE
+    // CLEANING SERVICES
+
+    public void insertCleaningService(Cleaning cleaning, Service service) throws SQLException {
+        String sql = "INSERT INTO cleaning_services(cleaning_id, service_id) VALUES (" + cleaning.getId() + ", " + service.getId();
+        executeStatement(sql);
+        System.out.println("Cleaning " + cleaning.getId() + " added service " + service.getId());
+    }
+
+    public void deleteCleaningService(Cleaning cleaning, Service service) throws SQLException {
+        String sql = "DELETE FROM cleaning_services WHERE cleaning_id = " + cleaning.getId() + " AND service_id = " + service.getId();
+        executeStatement(sql);
+        System.out.println("Cleaning " + cleaning.getId() + " deleted service " + service.getId());
+    }
+
+    // CLEANING TYPE FUNCTIONS
 
     public void insertCleaningType(String name) throws SQLException {
         String sql = "INSERT INTO cleaning_type(cleaning_type_name) VALUES ('" + name + "')";
@@ -610,7 +683,7 @@ public class DBAdapter {
         return cleaningTypes;
     }
 
-    // CLIENT
+    // CLIENT FUNCTIONS
 
     public void insertClient(String name, String surname, String secondName, ClientType clientType, Account account, String email, String phone) throws SQLException {
         String sql = "INSERT INTO client(client_name, client_surname, client_second_name, client_type_id, account_id, client_email, client_phone) VALUES ('" + name + "', '" + surname + "', '" + secondName + "', " + clientType.getId() + ", " + account.getId() + ", '" + email + "', '" + phone + "')";
@@ -743,7 +816,7 @@ public class DBAdapter {
         return clients;
     }
 
-    // CLIENT TYPE
+    // CLIENT TYPE FUNCTIONS
 
     public ClientType selectClientType(int clientTypeId) throws SQLException {
         ClientType clientType = null;
@@ -797,7 +870,7 @@ public class DBAdapter {
         return clientTypes;
     }
 
-    // COUNTRY
+    // COUNTRY FUNCTIONS
 
     public void insertCountry(String name) throws SQLException {
         String sql = "INSERT INTO country(country_name) VALUES ('" + name + "')";
@@ -856,7 +929,7 @@ public class DBAdapter {
         return countries;
     }
 
-    // PLACE TYPE
+    // PLACE TYPE FUNCTIONS
 
     public void insertPlaceType(String name) throws SQLException {
         String sql = "INSERT INTO place_type(place_type_name) VALUES ('" + name + "')";
@@ -913,7 +986,7 @@ public class DBAdapter {
         return placeTypes;
     }
 
-    // REVIEW
+    // REVIEW FUNCTIONS
 
     public void insertReview(String title, String body, Timestamp publicationTimestamp, Timestamp lastChangeTimestamp, int rating, Account account, Cleaning cleaning) throws SQLException {
         String sql = "INSERT INTO review(title, body, publication_timestamp, last_change_timestamp, rating, cleaning_id, account_id) VALUES ('" + title + "', '" + body + "', '" + publicationTimestamp.toString() + "', '" + lastChangeTimestamp + "', " + rating + ", " + cleaning.getId() + ", " + account.getId() + ")";
@@ -1023,7 +1096,7 @@ public class DBAdapter {
         return reviews;
     }
 
-    // SERVICE
+    // SERVICE FUNCTIONS
 
     public void insertService(String name, String description, double price) throws SQLException {
         String sql = "INSERT INTO service(service_name, service_description, service_price) VALUES ('" + name + "', '" + description + "', " + price + ")";
@@ -1115,7 +1188,7 @@ public class DBAdapter {
         return services;
     }
 
-    // STREET
+    // STREET FUNCTIONS
 
     public void insertStreet(String name, City city) throws SQLException {
         String sql = "INSERT INTO street(street_name, city_id) VALUES ('" + name + "', " + city.getId() + ")";
@@ -1175,6 +1248,25 @@ public class DBAdapter {
             int id = rs.getInt("street_id");
             String name = rs.getString("street_name");
             City city = selectCity(rs.getInt("city_id"));
+            streets.add(new Street(id, city, name));
+        }
+
+        rs.close();
+        statement.close();
+        return streets;
+    }
+
+    public ArrayList<Street> selectStreets(City city) throws SQLException {
+        ArrayList<Street> streets = new ArrayList<Street>();
+
+        String sql = "SELECT * FROM street WHERE city_id = " + city.getId();
+
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next()) {
+            int id = rs.getInt("street_id");
+            String name = rs.getString("street_name");
             streets.add(new Street(id, city, name));
         }
 
