@@ -9,11 +9,13 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 import java.sql.SQLException;
 
 public class LoginScreenBuilder implements Builder<Region> {
+    private final Stage stage;
     private final Account account;
     private final BooleanProperty isLoggedIn;
     private final DBAdapter adapter;
@@ -22,7 +24,8 @@ public class LoginScreenBuilder implements Builder<Region> {
 
     private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
 
-    public LoginScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchFromLoginScreen) {
+    public LoginScreenBuilder(Stage stage, Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchFromLoginScreen) {
+        this.stage = stage;
         this.account = account;
         this.isLoggedIn = isLoggedIn;
         this.adapter = adapter;
@@ -55,10 +58,12 @@ public class LoginScreenBuilder implements Builder<Region> {
     @Override
     public Region build() {
         GridPane window = new GridPane();
+        window.prefWidthProperty().bind(stage.widthProperty());
+        window.prefHeightProperty().bind(stage.heightProperty());
         window.setAlignment(Pos.CENTER);
         window.setHgap(10);  // gaps between columns
         window.setVgap(10);  // gaps between rows
-        window.setPadding(new Insets(25, 25, 25, 25));  // padding from the edges
+//        window.setPadding(new Insets(25, 25, 25, 25));  // padding from the edges
 
         Text welcomeText = new Text("Log in your account");
         welcomeText.setFont(Font.font("Verdana", 50));

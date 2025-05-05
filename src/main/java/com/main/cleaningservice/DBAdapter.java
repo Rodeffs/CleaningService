@@ -557,7 +557,9 @@ public class DBAdapter {
 
         if (rs.next()) {
             int id = rs.getInt("cleaning_id");
-            cleaning = new Cleaning(id, address, placeType, cleaningType, timestamp, client);
+            int cleanersAmount = rs.getInt("cleaners_amount");
+            double totalPrice = rs.getDouble("total_price");
+            cleaning = new Cleaning(id, address, placeType, cleaningType, timestamp, totalPrice, cleanersAmount, client);
         }
 
         rs.close();
@@ -579,7 +581,9 @@ public class DBAdapter {
             CleaningType cleaningType = selectCleaningType(rs.getInt("cleaning_type_id"));
             Timestamp timestamp = rs.getTimestamp("time_date");
             Client client = selectClient(rs.getInt("client_id"));
-            cleanings.add(new Cleaning(id, address, placeType, cleaningType, timestamp, client));
+            int cleanersAmount = rs.getInt("cleaners_amount");
+            double totalPrice = rs.getDouble("total_price");
+            cleanings.add(new Cleaning(id, address, placeType, cleaningType, timestamp, totalPrice, cleanersAmount, client));
         }
 
         rs.close();
@@ -600,7 +604,9 @@ public class DBAdapter {
             PlaceType placeType = selectPlaceType(rs.getInt("place_type_id"));
             CleaningType cleaningType = selectCleaningType(rs.getInt("cleaning_type_id"));
             Timestamp timestamp = rs.getTimestamp("time_date");
-            cleanings.add(new Cleaning(id, address, placeType, cleaningType, timestamp, client));
+            int cleanersAmount = rs.getInt("cleaners_amount");
+            double totalPrice = rs.getDouble("total_price");
+            cleanings.add(new Cleaning(id, address, placeType, cleaningType, timestamp, totalPrice, cleanersAmount, client));
         }
 
         rs.close();

@@ -4,16 +4,19 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 public class MainScreenBuilder implements Builder<Region> {
-    Account account;
-    Runnable returnToAuthenticationScreen;
-    DBAdapter adapter;
-    BooleanProperty isLoggedIn;
-    BooleanProperty adminGUIVisible = new SimpleBooleanProperty(false);
+    private final Stage stage;
+    private final Account account;
+    private final Runnable returnToAuthenticationScreen;
+    private final DBAdapter adapter;
+    private final BooleanProperty isLoggedIn;
+    private final BooleanProperty adminGUIVisible = new SimpleBooleanProperty(false);
 
-    public MainScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+    public MainScreenBuilder(Stage stage, Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+        this.stage = stage;
         this.account = account;
         this.isLoggedIn = isLoggedIn;
         this.returnToAuthenticationScreen = returnToAuthenticationScreen;
@@ -29,8 +32,8 @@ public class MainScreenBuilder implements Builder<Region> {
     public Region build() {
         isLoggedIn.addListener((ob, oldVal, newVal) -> showAdminGUI());
 
-        Region adminGUI = new AdminScreenBuilder(account, isLoggedIn, adapter, returnToAuthenticationScreen).build();
-        Region userGUI = new UserScreenBuilder(account, isLoggedIn, adapter, returnToAuthenticationScreen).build();
+        Region adminGUI = new AdminScreenBuilder(stage, account, isLoggedIn, adapter, returnToAuthenticationScreen).build();
+        Region userGUI = new UserScreenBuilder(stage, account, isLoggedIn, adapter, returnToAuthenticationScreen).build();
 
         adminGUI.visibleProperty().bind(adminGUIVisible);
         userGUI.visibleProperty().bind(adminGUIVisible.not());

@@ -13,6 +13,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 import java.sql.SQLException;
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class UserCleaningsAddScreenBuilder implements Builder<Region> {
+    private final Stage stage;
     private final DBAdapter adapter;
     private final Client client;
     private final BooleanProperty isClient;
@@ -61,7 +63,8 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
     private final BooleanProperty incorrectUnitVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty incorrectServicesVisible = new SimpleBooleanProperty(false);
 
-    public UserCleaningsAddScreenBuilder(DBAdapter adapter, Client client, BooleanProperty isClient, ObservableList<Cleaning> cleaningsList, Runnable exitScreen) {
+    public UserCleaningsAddScreenBuilder(Stage stage, DBAdapter adapter, Client client, BooleanProperty isClient, ObservableList<Cleaning> cleaningsList, Runnable exitScreen) {
+        this.stage = stage;
         this.adapter = adapter;
         this.client = client;
         this.isClient = isClient;
@@ -314,15 +317,18 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
-            }
 
-            resetDataAndQuit();
+            } finally {
+                resetDataAndQuit();
+            }
         }
     }
 
     @Override
     public Region build() {
         GridPane window = new GridPane();
+        window.prefWidthProperty().bind(stage.widthProperty());
+        window.prefHeightProperty().bind(stage.heightProperty());
         window.setAlignment(Pos.CENTER);
         window.setVgap(10);
         window.setHgap(10);

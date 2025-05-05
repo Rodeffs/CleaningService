@@ -8,9 +8,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 public class GlobalScreenBuilder implements Builder<Region> {
+    private final Stage stage;
+
+    public GlobalScreenBuilder(Stage stage) {
+        this.stage = stage;
+    }
+
     @Override
     public Region build() {
         DBAdapter adapter = new DBAdapter();
@@ -44,8 +51,8 @@ public class GlobalScreenBuilder implements Builder<Region> {
 
         Account account = new Account();
 
-        Region authenticationScreen = new AuthenticationScreenBuilder(account, isLoggedIn, adapter, () -> loginScreenActive.set(false)).build();
-        Region mainGUI = new MainScreenBuilder(account, isLoggedIn, adapter, () -> loginScreenActive.set(true)).build();
+        Region authenticationScreen = new AuthenticationScreenBuilder(stage, account, isLoggedIn, adapter, () -> loginScreenActive.set(false)).build();
+        Region mainGUI = new MainScreenBuilder(stage, account, isLoggedIn, adapter, () -> loginScreenActive.set(true)).build();
 
         authenticationScreen.visibleProperty().bind(loginScreenActive);
         mainGUI.visibleProperty().bind(loginScreenActive.not());

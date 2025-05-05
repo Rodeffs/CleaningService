@@ -12,12 +12,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class UserAccountScreenBuilder implements Builder<Region> {
+    private final Stage stage;
     private final Account account;
     private final Client client;
     private final DBAdapter adapter;
@@ -26,7 +28,8 @@ public class UserAccountScreenBuilder implements Builder<Region> {
 
     private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
 
-    public UserAccountScreenBuilder(Account account, BooleanProperty isLoggedIn, Client client, BooleanProperty isClient, DBAdapter adapter) {
+    public UserAccountScreenBuilder(Stage stage, Account account, BooleanProperty isLoggedIn, Client client, BooleanProperty isClient, DBAdapter adapter) {
+        this.stage = stage;
         this.account = account;
         this.client = client;
         this.isClient = isClient;
@@ -42,7 +45,7 @@ public class UserAccountScreenBuilder implements Builder<Region> {
 
         try {
 
-            if ((adapter.selectAccount(newLogin) != null) && !newLogin.equals(account.getLogin())) {
+            if (!newLogin.equals(account.getLogin()) && (adapter.selectAccount(newLogin) != null)) {
                 incorrectLoginVisible.set(true);
                 return;
             }

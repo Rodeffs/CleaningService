@@ -1,6 +1,7 @@
 package com.main.cleaningservice;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +14,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 import java.sql.SQLException;
@@ -23,21 +25,22 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class UserCleaningsEditScreenBuilder implements Builder<Region> {
+    private final Stage stage;
     private final DBAdapter adapter;
-    private final BooleanProperty isSelected;
-    private final Cleaning selectedCleaning;
+    private final Cleaning selectedCleaning = new Cleaning();
     private final Runnable exitScreen;
+    private final TableView<Cleaning> cleaningsTable;
 
     private final Country selectCountryPrompt = new Country(-1, "Select Country");
-    private final ObservableList<Country> countryList = FXCollections.observableArrayList(selectCountryPrompt);
+    private final ObservableList<Country> countryList = FXCollections.observableArrayList();
     private final City selectCityPrompt = new City(-1, selectCountryPrompt, "Select City");
-    private final ObservableList<City> cityList = FXCollections.observableArrayList(selectCityPrompt);
+    private final ObservableList<City> cityList = FXCollections.observableArrayList();
     private final Street selectStreetPrompt = new Street(-1, selectCityPrompt, "Select Street");
-    private final ObservableList<Street> streetList = FXCollections.observableArrayList(selectStreetPrompt);
+    private final ObservableList<Street> streetList = FXCollections.observableArrayList();
     private final PlaceType selectPlaceTypePrompt = new PlaceType(-1, "Select Place Type");
-    private final ObservableList<PlaceType> placeTypeList = FXCollections.observableArrayList(selectPlaceTypePrompt);
+    private final ObservableList<PlaceType> placeTypeList = FXCollections.observableArrayList();
     private final CleaningType selectCleaningTypePrompt = new CleaningType(-1, "Select Cleaning Type");
-    private final ObservableList<CleaningType> cleaningTypeList = FXCollections.observableArrayList(selectCleaningTypePrompt);
+    private final ObservableList<CleaningType> cleaningTypeList = FXCollections.observableArrayList();
     private final ObservableList<Service> serviceList = FXCollections.observableArrayList();
 
     private final TextField dateTimeInput = new TextField();
@@ -63,21 +66,34 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
 
     private final ArrayList<Service> previouslySelectedServices = new ArrayList<>();
 
-    public UserCleaningsEditScreenBuilder(DBAdapter adapter, Cleaning selectedCleaning, BooleanProperty isSelected, Runnable exitScreen) {
+    public UserCleaningsEditScreenBuilder(Stage stage, DBAdapter adapter, TableView<Cleaning> cleaningsTable, Runnable exitScreen) {
+        this.stage = stage;
         this.adapter = adapter;
-        this.isSelected = isSelected;
-        this.selectedCleaning = selectedCleaning;
+        this.cleaningsTable = cleaningsTable;
         this.exitScreen = exitScreen;
     }
 
     private void setData() {
-        if (!isSelected.getValue())
+        System.out.println("New cleaning is selected");
+
+        Cleaning newSelected = cleaningsTable.getSelectionModel().getSelectedItem();
+
+        if (newSelected == null)
             return;
 
+        selectedCleaning.setCleaning(newSelected);
+
         try {
+            countryList.clear();
+            countryList.add(selectCountryPrompt);
             countryList.addAll(adapter.selectCountries());
+            placeTypeList.clear();
+            placeTypeList.add(selectPlaceTypePrompt);
             placeTypeList.addAll(adapter.selectPlaceTypes());
+            cleaningTypeList.clear();
+            cleaningTypeList.add(selectCleaningTypePrompt);
             cleaningTypeList.addAll(adapter.selectCleaningTypes());
+            serviceList.clear();
             serviceList.addAll(adapter.selectServices());
 
             dateTimeInput.setText(selectedCleaning.getTimestamp().toString());
@@ -91,11 +107,8 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
             placeInput.setValue(selectedCleaning.getPlaceType());
             typeInput.setValue(selectedCleaning.getCleaningType());
             totalPriceOutput.setText(Double.toString(selectedCleaning.getTotalPrice()));
-
+            previouslySelectedServices.clear();
             previouslySelectedServices.addAll(adapter.selectCleaningServices(selectedCleaning));
-
-            for (Service selectedService : previouslySelectedServices)
-                serviceSelection.getSelectionModel().select(selectedService);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -150,7 +163,10 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
     }
 
     private void resetDataAndQuit() {
+        selectedCleaning.clear();
         dateTimeInput.clear();
+        countryList.clear();
+        countryList.add(selectCountryPrompt);
         countryInput.setValue(selectCountryPrompt);
         cityList.clear();
         cityList.add(selectCityPrompt);
@@ -162,8 +178,6 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
         entranceInput.clear();
         floorInput.clear();
         unitInput.clear();
-        placeInput.setValue(selectPlaceTypePrompt);
-        typeInput.setValue(selectCleaningTypePrompt);
         serviceSelection.getSelectionModel().clearSelection();
         totalPriceOutput.setText("0.0");
         incorrectInputVisible.set(false);
@@ -174,8 +188,15 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
         incorrectUnitVisible.set(false);
         incorrectServicesVisible.set(false);
         previouslySelectedServices.clear();
+        countryList.clear();
+        placeTypeList.clear();
+        placeTypeList.add(selectPlaceTypePrompt);
+        placeInput.setValue(selectPlaceTypePrompt);
+        cleaningTypeList.clear();
+        cleaningTypeList.add(selectCleaningTypePrompt);
+        typeInput.setValue(selectCleaningTypePrompt);
+        serviceList.clear();
         exitScreen.run();
-        isSelected.set(false);
     }
 
     private boolean checkValidity() {
@@ -343,25 +364,29 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
                 for (Service cancelledService : previouslySelectedServices)
                     adapter.deleteCleaningService(selectedCleaning, cancelledService);
 
-                adapter.updateCleaningTotalPrice(selectedCleaning, newTotalPrice);
+                if (newTotalPrice != selectedCleaning.getTotalPrice())
+                    adapter.updateCleaningTotalPrice(selectedCleaning, newTotalPrice);
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
-            }
 
-            resetDataAndQuit();
+            } finally {
+                resetDataAndQuit();
+            }
         }
     }
 
     @Override
     public Region build() {
         GridPane window = new GridPane();
+        window.prefWidthProperty().bind(stage.widthProperty());
+        window.prefHeightProperty().bind(stage.heightProperty());
         window.setAlignment(Pos.CENTER);
         window.setVgap(10);
         window.setHgap(10);
         window.setPadding(new Insets(25, 25, 25, 25));
 
-        isSelected.addListener((ob, oldValue, newValue) -> setData());
+        cleaningsTable.getSelectionModel().selectedItemProperty().addListener((ob, oldVal, newVal) -> setData());
 
         Text orderText = new Text("Edit a cleaning");
         orderText.setFont(Font.font("Verdana", 50));

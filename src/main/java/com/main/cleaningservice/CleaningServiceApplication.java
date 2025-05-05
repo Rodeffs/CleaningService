@@ -12,7 +12,7 @@ public class CleaningServiceApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(new GlobalScreenBuilder().build());
+        Scene scene = new Scene(new GlobalScreenBuilder(primaryStage).build());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

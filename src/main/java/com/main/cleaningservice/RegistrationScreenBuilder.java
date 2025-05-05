@@ -10,12 +10,14 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class RegistrationScreenBuilder implements Builder<Region> {
+    private final Stage stage;
     private final Account account;
     private final Runnable exitAuthenticationScreen;
     private final Runnable switchToLoginScreen;
@@ -24,7 +26,8 @@ public class RegistrationScreenBuilder implements Builder<Region> {
     private final BooleanProperty incorrectInputVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty isLoggedIn;
 
-    public RegistrationScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchToLoginScreen) {
+    public RegistrationScreenBuilder(Stage stage, Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable exitAuthenticationScreen, Runnable switchToLoginScreen) {
+        this.stage = stage;
         this.account = account;
         this.isLoggedIn = isLoggedIn;
         this.adapter = adapter;
@@ -88,10 +91,12 @@ public class RegistrationScreenBuilder implements Builder<Region> {
     @Override
     public Region build() {
         GridPane window = new GridPane();
+        window.prefWidthProperty().bind(stage.widthProperty());
+        window.prefHeightProperty().bind(stage.heightProperty());
         window.setAlignment(Pos.CENTER);
         window.setHgap(10);  // gaps between columns
         window.setVgap(10);  // gaps between rows
-        window.setPadding(new Insets(25, 25, 25, 25));  // padding from the edges
+//        window.setPadding(new Insets(25, 25, 25, 25));  // padding from the edges
 
         Text registerText = new Text("Create an account");
         registerText.setFont(Font.font("Verdana", 50));

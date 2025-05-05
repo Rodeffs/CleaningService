@@ -7,11 +7,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Builder;
 
 import java.sql.SQLException;
 
 public class UserScreenBuilder implements Builder<Region> {
+    private final Stage stage;
     private final Account account;
     private final BooleanProperty isLoggedIn;
     private final Runnable returnToAuthenticationScreen;
@@ -24,7 +26,8 @@ public class UserScreenBuilder implements Builder<Region> {
     private final BooleanProperty yourCleaningsVisible = new SimpleBooleanProperty(true);
     private final BooleanProperty yourReviewsVisible = new SimpleBooleanProperty(false);
 
-    public UserScreenBuilder(Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+    public UserScreenBuilder(Stage stage, Account account, BooleanProperty isLoggedIn, DBAdapter adapter, Runnable returnToAuthenticationScreen) {
+        this.stage = stage;
         this.account = account;
         this.isLoggedIn = isLoggedIn;
         this.returnToAuthenticationScreen = returnToAuthenticationScreen;
@@ -81,13 +84,13 @@ public class UserScreenBuilder implements Builder<Region> {
 
         window.setTop(controlButtons);
 
-        Region accountInfo = new UserAccountScreenBuilder(account, isLoggedIn, client, isClient, adapter).build();
+        Region accountInfo = new UserAccountScreenBuilder(stage, account, isLoggedIn, client, isClient, adapter).build();
         accountInfo.visibleProperty().bind(accountInfoVisible);
 
-        Region yourCleanings = new UserCleaningsScreenBuilder(client, isClient, adapter).build();
+        Region yourCleanings = new UserCleaningsScreenBuilder(stage, client, isClient, adapter).build();
         yourCleanings.visibleProperty().bind(yourCleaningsVisible);
 
-        Region yourReviews = new UserReviewsScreenBuilder(account, adapter).build();
+        Region yourReviews = new UserReviewsScreenBuilder(stage, account, adapter).build();
         yourReviews.visibleProperty().bind(yourReviewsVisible);
 
         window.setCenter(new StackPane(accountInfo, yourCleanings, yourReviews));
