@@ -1,7 +1,6 @@
 package com.main.cleaningservice;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -74,14 +73,10 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
     }
 
     private void setData() {
-        System.out.println("New cleaning is selected");
-
-        Cleaning newSelected = cleaningsTable.getSelectionModel().getSelectedItem();
-
-        if (newSelected == null)
+        if (cleaningsTable.getSelectionModel().getSelectedItem() == null)
             return;
 
-        selectedCleaning.setCleaning(newSelected);
+        selectedCleaning.setCleaning(cleaningsTable.getSelectionModel().getSelectedItem());
 
         try {
             countryList.clear();
@@ -106,7 +101,7 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
             unitInput.setText(Integer.toString(selectedCleaning.getAddress().getUnitNumber()));
             placeInput.setValue(selectedCleaning.getPlaceType());
             typeInput.setValue(selectedCleaning.getCleaningType());
-            totalPriceOutput.setText(Double.toString(selectedCleaning.getTotalPrice()));
+            totalPriceOutput.setText("0.0");
             previouslySelectedServices.clear();
             previouslySelectedServices.addAll(adapter.selectCleaningServices(selectedCleaning));
 
@@ -157,7 +152,8 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
         double totalPrice = 0.0;
 
         for (Service service : selectedServices)
-            totalPrice += service.getPrice();
+            if (service != null)
+                totalPrice += service.getPrice();
 
         totalPriceOutput.setText(Double.toString(totalPrice));
     }

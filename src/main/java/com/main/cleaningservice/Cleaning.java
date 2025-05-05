@@ -1,5 +1,10 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 import java.sql.Timestamp;
 
 public class Cleaning {
@@ -8,8 +13,8 @@ public class Cleaning {
     private PlaceType placeType;
     private CleaningType cleaningType;
     private Timestamp timestamp;
-    private double totalPrice;
-    private int cleanersAmount;
+    private DoubleProperty totalPrice;  // otherwise they won't get updated in table
+    private IntegerProperty cleanersAmount;
     private Client client;
 
     public Cleaning() {
@@ -18,8 +23,8 @@ public class Cleaning {
         placeType = null;
         cleaningType = null;
         timestamp = null;
-        totalPrice = 0.0;
-        cleanersAmount = 0;
+        totalPrice = new SimpleDoubleProperty(0.0);
+        cleanersAmount = new SimpleIntegerProperty(0);
         client = null;
     }
 
@@ -29,8 +34,8 @@ public class Cleaning {
         this.placeType = placeType;
         this.cleaningType = cleaningType;
         this.timestamp = timestamp;
-        this.totalPrice = totalPrice;
-        this.cleanersAmount = cleanersAmount;
+        this.totalPrice = new SimpleDoubleProperty(totalPrice);
+        this.cleanersAmount = new SimpleIntegerProperty(cleanersAmount);
         this.client = client;
     }
 
@@ -40,8 +45,8 @@ public class Cleaning {
         this.placeType = placeType;
         this.cleaningType = cleaningType;
         this.timestamp = timestamp;
-        this.totalPrice = totalPrice;
-        this.cleanersAmount = 0;
+        this.totalPrice = new SimpleDoubleProperty(totalPrice);
+        this.cleanersAmount = new SimpleIntegerProperty(0);
         this.client = client;
     }
 
@@ -51,8 +56,8 @@ public class Cleaning {
         this.placeType = placeType;
         this.cleaningType = cleaningType;
         this.timestamp = timestamp;
-        this.totalPrice = 0.0;
-        this.cleanersAmount = 0;
+        this.totalPrice = new SimpleDoubleProperty(0.0);
+        this.cleanersAmount = new SimpleIntegerProperty(0);
         this.client = client;
     }
 
@@ -97,18 +102,34 @@ public class Cleaning {
     }
 
     public double getTotalPrice() {
-        return totalPrice;
+        return totalPrice.getValue();
     }
 
     public void setTotalPrice(double totalPrice) {
+        this.totalPrice.set(totalPrice);
+    }
+
+    public DoubleProperty getTotalPriceProperty() {
+        return totalPrice;
+    }
+
+    public void setTotalPriceProperty(DoubleProperty totalPrice) {
         this.totalPrice = totalPrice;
     }
 
     public int getCleanersAmount() {
-        return cleanersAmount;
+        return cleanersAmount.getValue();
     }
 
     public void setCleanersAmount(int cleanersAmount) {
+        this.cleanersAmount.set(cleanersAmount);
+    }
+
+    public IntegerProperty getCleanersAmountProperty() {
+        return cleanersAmount;
+    }
+
+    public void setCleanersAmountProperty(IntegerProperty cleanersAmount) {
         this.cleanersAmount = cleanersAmount;
     }
 
@@ -126,8 +147,8 @@ public class Cleaning {
         placeType = otherCleaning.getPlaceType();
         cleaningType = otherCleaning.getCleaningType();
         timestamp = otherCleaning.getTimestamp();
-        totalPrice = otherCleaning.getTotalPrice();
-        cleanersAmount = otherCleaning.getCleanersAmount();
+        totalPrice = otherCleaning.getTotalPriceProperty();
+        cleanersAmount = otherCleaning.getCleanersAmountProperty();
         client = otherCleaning.getClient();
     }
 
@@ -137,8 +158,8 @@ public class Cleaning {
         placeType = null;
         cleaningType = null;
         timestamp = null;
-        totalPrice = 0.0;
-        cleanersAmount = 0;
+        totalPrice = new SimpleDoubleProperty(0.0);
+        cleanersAmount = new SimpleIntegerProperty(0);
         client = null;
     }
 }

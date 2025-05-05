@@ -1,6 +1,6 @@
 package com.main.cleaningservice;
 
-public enum UserCleaningsScreen {
+public enum CleaningsScreen {
     TABLE,
     ADD,
     EDIT

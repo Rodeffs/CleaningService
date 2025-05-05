@@ -54,10 +54,10 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         }
     }
 
-    private void setVisibility(UserCleaningsScreen selectedScreen) {
-        tableScreenVisible.set(selectedScreen == UserCleaningsScreen.TABLE);
-        tableAddScreenVisible.set(selectedScreen == UserCleaningsScreen.ADD);
-        tableEditScreenVisible.set(selectedScreen == UserCleaningsScreen.EDIT);
+    private void setVisibility(CleaningsScreen selectedScreen) {
+        tableScreenVisible.set(selectedScreen == CleaningsScreen.TABLE);
+        tableAddScreenVisible.set(selectedScreen == CleaningsScreen.ADD);
+        tableEditScreenVisible.set(selectedScreen == CleaningsScreen.EDIT);
         cleaningsTable.getSelectionModel().clearSelection();
         cleaningsTable.refresh();
     }
@@ -89,10 +89,10 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
 
         tableScreen.visibleProperty().bind(tableScreenVisible);
 
-        Region tableAddScreen = new UserCleaningsAddScreenBuilder(stage, adapter, client, isClient, cleaningsList, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
+        Region tableAddScreen = new UserCleaningsAddScreenBuilder(stage, adapter, client, isClient, cleaningsList, () -> setVisibility(CleaningsScreen.TABLE)).build();
         tableAddScreen.visibleProperty().bind(tableAddScreenVisible);
 
-        Region tableEditScreen = new UserCleaningsEditScreenBuilder(stage, adapter, cleaningsTable, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
+        Region tableEditScreen = new UserCleaningsEditScreenBuilder(stage, adapter, cleaningsTable, () -> setVisibility(CleaningsScreen.TABLE)).build();
         tableEditScreen.visibleProperty().bind(tableEditScreenVisible);
 
         window.setCenter(new StackPane(tableScreen, tableAddScreen, tableEditScreen));
@@ -166,10 +166,10 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         isClient.addListener(e -> setCleaningsList());
 
         Button orderButton = new Button("Order a cleaning");
-        orderButton.setOnAction(e -> setVisibility(UserCleaningsScreen.ADD));
+        orderButton.setOnAction(e -> setVisibility(CleaningsScreen.ADD));
 
         Button editButton = new Button("Edit ordered cleaning");
-        editButton.setOnAction(e -> setVisibility(UserCleaningsScreen.EDIT));
+        editButton.setOnAction(e -> setVisibility(CleaningsScreen.EDIT));
 
         Button deleteButton = new Button("Cancel an order");
         deleteButton.setOnAction(e -> deleteSelected());
