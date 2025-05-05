@@ -69,4 +69,14 @@ public class Address {
     public String toString() {
         return street.getCity().getCountry().getName() + "\n" + street.getCity().getName() + "\n" + street.getName() + ", " + buildingNumber + "\nEntrance " + entranceNumber + "\nFloor " + floorNumber + "\nUnit " + unitNumber;
     }
+
+    @Override
+    public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof Address))
+            return false;
+
+        Address otherAddress = (Address) otherObj;
+
+        return (id == otherAddress.getId()) && (street.equals(otherAddress.getStreet())) && (buildingNumber == otherAddress.getBuildingNumber()) && (entranceNumber == otherAddress.getEntranceNumber()) && (floorNumber == otherAddress.getFloorNumber()) && (unitNumber == otherAddress.getUnitNumber());
+    }
 }

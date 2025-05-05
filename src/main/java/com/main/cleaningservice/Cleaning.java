@@ -130,4 +130,15 @@ public class Cleaning {
         cleanersAmount = otherCleaning.getCleanersAmount();
         client = otherCleaning.getClient();
     }
+
+    public void clear() {
+        id = -1;
+        address = null;
+        placeType = null;
+        cleaningType = null;
+        timestamp = null;
+        totalPrice = 0.0;
+        cleanersAmount = 0;
+        client = null;
+    }
 }

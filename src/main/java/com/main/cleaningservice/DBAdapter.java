@@ -514,6 +514,13 @@ public class DBAdapter {
         System.out.println("Cleaning " + cleaning.getId() + " client changed");
     }
 
+    public void updateCleaningTotalPrice(Cleaning cleaning, double totalPrice) throws SQLException {
+        String sql = "UPDATE cleaning SET total_price = " + totalPrice + " WHERE cleaning_id = " + cleaning.getId();
+        executeStatement(sql);
+        cleaning.setTotalPrice(totalPrice);
+        System.out.println("Cleaning " + cleaning.getId() + " total price changed");
+    }
+
     public void deleteCleaning(Cleaning cleaning) throws SQLException {
         String sql = "DELETE FROM cleaning WHERE cleaning_id = " + cleaning.getId();
         executeStatement(sql);
@@ -625,6 +632,23 @@ public class DBAdapter {
         String sql = "DELETE FROM cleaning_services WHERE cleaning_id = " + cleaning.getId() + " AND service_id = " + service.getId();
         executeStatement(sql);
         System.out.println("Cleaning " + cleaning.getId() + " deleted service " + service.getId());
+    }
+
+    public ArrayList<Service> selectCleaningServices(Cleaning cleaning) throws SQLException {
+        ArrayList<Service> services = new ArrayList<Service>();
+
+        String sql = "SELECT * FROM cleaning_services WHERE cleaning_id = " + cleaning.getId();
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(sql);
+
+        while (rs.next()) {
+            int id = rs.getInt("service_id");
+            services.add(selectService(id));
+        }
+
+        rs.close();
+        statement.close();
+        return services;
     }
 
     // CLEANING TYPE FUNCTIONS

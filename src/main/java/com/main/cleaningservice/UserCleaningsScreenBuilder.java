@@ -30,6 +30,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
     private final BooleanProperty tableScreenVisible = new SimpleBooleanProperty(true);
     private final BooleanProperty tableAddScreenVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty tableEditScreenVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty isSelected = new SimpleBooleanProperty(false);
 
     public UserCleaningsScreenBuilder(Client client, BooleanProperty isClient, DBAdapter adapter) {
         this.client = client;
@@ -120,22 +121,31 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         tableEditScreenVisible.set(selectedScreen == UserCleaningsScreen.EDIT);
     }
 
-    private void selectCleaningToEdit() {
+    private void selectCleaning() {
         Cleaning newSelected = cleaningsTable.getSelectionModel().getSelectedItem();
 
         if (newSelected != null) {
             selectedCleaning.setCleaning(newSelected);
-            setVisibility(UserCleaningsScreen.EDIT);
+            isSelected.set(true);
+        }
+        else {
+            selectedCleaning.clear();
+            isSelected.set(false);
         }
     }
 
-    private void deleteSelected() {
-        Cleaning newSelected = cleaningsTable.getSelectionModel().getSelectedItem();
+    private void beginEditing() {
+        if (isSelected.getValue())
+            setVisibility(UserCleaningsScreen.EDIT);
+    }
 
-        if (newSelected != null) {
+    private void deleteSelected() {
+        Cleaning unselected = new Cleaning();
+
+        if (!selectedCleaning.equals(unselected)) {
             try {
-                adapter.deleteCleaning(newSelected);
-                cleaningsList.remove(newSelected);
+                adapter.deleteCleaning(selectedCleaning);
+                cleaningsList.remove(selectedCleaning);
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -153,7 +163,7 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         Region tableAddScreen = new UserCleaningsAddScreenBuilder(adapter, client, isClient, cleaningsList, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
         tableAddScreen.visibleProperty().bind(tableAddScreenVisible);
 
-        Region tableEditScreen = new UserCleaningsEditScreenBuilder(adapter, client, isClient, selectedCleaning, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
+        Region tableEditScreen = new UserCleaningsEditScreenBuilder(adapter, selectedCleaning, isSelected, () -> setVisibility(UserCleaningsScreen.TABLE)).build();
         tableEditScreen.visibleProperty().bind(tableEditScreenVisible);
 
         window.setCenter(new StackPane(tableScreen, tableAddScreen, tableEditScreen));
@@ -162,13 +172,15 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
         cleaningsTable.setItems(cleaningsList);
         tableScreen.setContent(cleaningsTable);
 
+        cleaningsTable.getSelectionModel().selectedItemProperty().addListener((ob, oldVal, newVal) -> selectCleaning());
+
         isClient.addListener(e -> setCleaningsList());
 
         Button orderButton = new Button("Order a cleaning");
         orderButton.setOnAction(e -> setVisibility(UserCleaningsScreen.ADD));
 
         Button editButton = new Button("Edit ordered cleaning");
-        editButton.setOnAction(e -> selectCleaningToEdit());
+        editButton.setOnAction(e -> beginEditing());
 
         Button deleteButton = new Button("Cancel an order");
         deleteButton.setOnAction(e -> deleteSelected());
