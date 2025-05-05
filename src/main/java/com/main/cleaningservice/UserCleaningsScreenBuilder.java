@@ -180,5 +180,4 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
 
         return window;
     }
-
 }

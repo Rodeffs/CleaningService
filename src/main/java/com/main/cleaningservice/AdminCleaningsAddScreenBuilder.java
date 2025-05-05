@@ -22,11 +22,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class UserCleaningsAddScreenBuilder implements Builder<Region> {
+public class AdminCleaningsAddScreenBuilder implements Builder<Region> {
     private final Stage stage;
     private final DBAdapter adapter;
-    private final Client client;
-    private final BooleanProperty isClient;
+    private final BooleanProperty isAdmin;
     private final ObservableList<Cleaning> cleaningsList;
     private final Runnable exitScreen;
 
@@ -41,6 +40,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
     private final CleaningType selectCleaningTypePrompt = new CleaningType(-1, "Select Cleaning Type");
     private final ObservableList<CleaningType> cleaningTypeList = FXCollections.observableArrayList(selectCleaningTypePrompt);
     private final ObservableList<Service> serviceList = FXCollections.observableArrayList();
+    private final ObservableList<Client> clientList = FXCollections.observableArrayList();
 
     private final TextField dateTimeInput = new TextField();
     private final ComboBox<Country> countryInput = new ComboBox<>(countryList);
@@ -53,6 +53,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
     private final ComboBox<PlaceType> placeInput = new ComboBox<>(placeTypeList);
     private final ComboBox<CleaningType> typeInput = new ComboBox<>(cleaningTypeList);
     private final ListView<Service> serviceSelection = new ListView<>(serviceList);
+    private final ListView<Client> clientSelection = new ListView<>(clientList);
     private final TextField totalPriceOutput = new TextField("0.0");
 
     private final BooleanProperty incorrectInputVisible = new SimpleBooleanProperty(false);
@@ -62,18 +63,18 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
     private final BooleanProperty incorrectFloorVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty incorrectUnitVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty incorrectServicesVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty incorrectClientVisible = new SimpleBooleanProperty(false);
 
-    public UserCleaningsAddScreenBuilder(Stage stage, DBAdapter adapter, Client client, BooleanProperty isClient, ObservableList<Cleaning> cleaningsList, Runnable exitScreen) {
+    public AdminCleaningsAddScreenBuilder(Stage stage, DBAdapter adapter, BooleanProperty isAdmin, ObservableList<Cleaning> cleaningsList, Runnable exitScreen) {
         this.stage = stage;
         this.adapter = adapter;
-        this.client = client;
-        this.isClient = isClient;
+        this.isAdmin = isAdmin;
         this.cleaningsList = cleaningsList;
         this.exitScreen = exitScreen;
     }
 
     private void setData() {
-        if (!isClient.getValue())
+        if (!isAdmin.getValue())
             return;
 
         try {
@@ -81,6 +82,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
             placeTypeList.addAll(adapter.selectPlaceTypes());
             cleaningTypeList.addAll(adapter.selectCleaningTypes());
             serviceList.addAll(adapter.selectServices());
+            clientList.addAll(adapter.selectClients());
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -150,6 +152,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         floorInput.clear();
         unitInput.clear();
         serviceSelection.getSelectionModel().clearSelection();
+        clientSelection.getSelectionModel().clearSelection();
         totalPriceOutput.setText("0.0");
         incorrectInputVisible.set(false);
         incorrectDateTimeVisible.set(false);
@@ -166,24 +169,20 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         cleaningTypeList.add(selectCleaningTypePrompt);
         typeInput.setValue(selectCleaningTypePrompt);
         serviceList.clear();
+        clientList.clear();
         exitScreen.run();
     }
 
     private boolean checkValidity() {
         boolean inputIsCorrect = true;
 
-        // Checking date and time (can't be before today and can't be after 5 years)
+        // Checking date and time
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date parsed = dateFormat.parse(dateTimeInput.getText());
             Timestamp dateTime = new Timestamp(parsed.getTime());
-
-            Timestamp now = new Timestamp(System.currentTimeMillis());
-            Timestamp fiveYears = new Timestamp(System.currentTimeMillis() + 1000L*60*60*24*365*5);
-            inputIsCorrect = !dateTime.before(now) && !dateTime.after(fiveYears);
-
-            incorrectDateTimeVisible.set(dateTime.before(now) || dateTime.after(fiveYears));
+            incorrectDateTimeVisible.set(false);
 
         } catch (ParseException e) {
             incorrectDateTimeVisible.set(true);
@@ -284,6 +283,17 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         else
             incorrectServicesVisible.set(false);
 
+        // Checking selected client
+
+        Client client = clientSelection.getSelectionModel().getSelectedItem();
+
+        if (client == null) {
+            incorrectClientVisible.set(true);
+            inputIsCorrect = false;
+        }
+        else
+            incorrectClientVisible.set(false);
+
         return inputIsCorrect;
     }
 
@@ -298,6 +308,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
             PlaceType placeType = placeInput.getSelectionModel().getSelectedItem();
             CleaningType cleaningType = typeInput.getSelectionModel().getSelectedItem();
             ObservableList<Service> services = serviceSelection.getSelectionModel().getSelectedItems();
+            Client client = clientSelection.getSelectionModel().getSelectedItem();
             double totalPrice = Double.parseDouble(totalPriceOutput.getText());
 
             try {
@@ -347,7 +358,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         window.setHgap(10);
         window.setPadding(new Insets(25, 25, 25, 25));
 
-        isClient.addListener((ob, oldValue, newValue) -> setData());
+        isAdmin.addListener((ob, oldValue, newValue) -> setData());
 
         Text orderText = new Text("Order a cleaning");
         orderText.setFont(Font.font("Verdana", 50));
@@ -437,9 +448,18 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         incorrectServicesText.visibleProperty().bind(incorrectServicesVisible);
         window.add(incorrectServicesText, 2, 11);
 
-        window.add(new Label("Total price:"), 0, 12);
+        window.add(new Label("Select Client:"), 0, 12);
+        window.add(clientSelection, 1, 12);
+
+        Text incorrectClientText = new Text("You must select a client!");
+        incorrectClientText.setFont(Font.font("Verdana", 20));
+        incorrectClientText.setFill(Color.RED);
+        incorrectClientText.visibleProperty().bind(incorrectClientVisible);
+        window.add(incorrectClientText, 2, 12);
+
+        window.add(new Label("Total price:"), 0, 13);
         totalPriceOutput.setEditable(false);
-        window.add(totalPriceOutput, 1, 12);
+        window.add(totalPriceOutput, 1, 13);
 
         Button orderButton = new Button("Order");
         orderButton.setOnAction(e -> order());
@@ -447,7 +467,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         HBox orderBox = new HBox(10);
         orderBox.setAlignment(Pos.BOTTOM_LEFT);
         orderBox.getChildren().add(orderButton);
-        window.add(orderBox, 0, 13);
+        window.add(orderBox, 0, 14);
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> resetDataAndQuit());
@@ -455,13 +475,13 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         HBox cancelBox = new HBox(10);
         cancelBox.setAlignment(Pos.BOTTOM_RIGHT);
         cancelBox.getChildren().add(cancelButton);
-        window.add(cancelBox, 1, 13);
+        window.add(cancelBox, 1, 14);
 
         Text incorrectInputText = new Text("Some selectable fields are empty!");
         incorrectInputText.setFont(Font.font("Verdana", 20));
         incorrectInputText.setFill(Color.RED);
         incorrectInputText.visibleProperty().bind(incorrectInputVisible);
-        window.add(incorrectInputText, 0, 14, 2, 1);
+        window.add(incorrectInputText, 0, 15, 2, 1);
 
         return new ScrollPane(window);
     }

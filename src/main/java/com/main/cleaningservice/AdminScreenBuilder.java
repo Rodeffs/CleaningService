@@ -72,10 +72,10 @@ public class AdminScreenBuilder implements Builder<Region> {
         Region accountInfo = new AdminAccountScreenBuilder(stage, account, isLoggedIn, isAdmin, adapter).build();
         accountInfo.visibleProperty().bind(accountInfoVisible);
 
-//        Region cleanings = new AdminCleaningsScreenBuilder(stage, isAdmin, adapter).build();
-//        cleanings.visibleProperty().bind(cleaningsVisible);
-//
-//        window.setCenter(new StackPane(accountInfo, cleanings));
+        Region cleanings = new AdminCleaningsScreenBuilder(stage, isAdmin, adapter).build();
+        cleanings.visibleProperty().bind(cleaningsVisible);
+
+        window.setCenter(new StackPane(accountInfo, cleanings));
 
         return window;
     }
