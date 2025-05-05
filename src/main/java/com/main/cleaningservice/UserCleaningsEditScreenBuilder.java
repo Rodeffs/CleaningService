@@ -206,8 +206,9 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
             Timestamp dateTime = new Timestamp(parsed.getTime());
 
             Timestamp now = new Timestamp(System.currentTimeMillis());
-            Timestamp fiveYears = new Timestamp(System.currentTimeMillis() + 1000*60*60*24*365*5);
+            Timestamp fiveYears = new Timestamp(System.currentTimeMillis() + 1000L*60*60*24*365*5);
             incorrectDateTimeVisible.set(dateTime.before(now) || dateTime.after(fiveYears));
+            inputIsCorrect = !dateTime.before(now) && !dateTime.after(fiveYears);
 
         } catch (ParseException e) {
             incorrectDateTimeVisible.set(true);
