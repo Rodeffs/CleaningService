@@ -1,5 +1,8 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Address {
     private int id;
     private Street street;
@@ -7,6 +10,7 @@ public class Address {
     private int entranceNumber;
     private int floorNumber;
     private int unitNumber;
+    private StringProperty stringProperty;
 
     public Address(int id, Street street, int buildingNumber, int entranceNumber, int floorNumber, int unitNumber) {
         this.id = id;
@@ -15,6 +19,7 @@ public class Address {
         this.entranceNumber = entranceNumber;
         this.floorNumber = floorNumber;
         this.unitNumber = unitNumber;
+        this.stringProperty = new SimpleStringProperty(toString());
     }
 
     public int getId() {
@@ -63,6 +68,14 @@ public class Address {
 
     public void setUnitNumber(int unitNumber) {
         this.unitNumber = unitNumber;
+    }
+
+    public StringProperty getStringProperty() {
+        return stringProperty;
+    }
+
+    public void setStringProperty(StringProperty stringProperty) {
+        this.stringProperty = stringProperty;
     }
 
     @Override

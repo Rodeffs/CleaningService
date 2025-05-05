@@ -43,7 +43,7 @@ public class UserScreenBuilder implements Builder<Region> {
     }
 
     private void logInClient() {
-        if (!isLoggedIn.getValue())
+        if (!isLoggedIn.getValue() || account.getType().getName().equals("admin"))
             return;
 
         try {

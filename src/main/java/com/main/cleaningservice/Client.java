@@ -10,6 +10,7 @@ public class Client {
     private String email;
     private String phone;
 
+
     public Client() {
         id = -1;
         name = null;
@@ -116,5 +117,10 @@ public class Client {
         account = otherClient.getAccount();
         email = otherClient.getEmail();
         phone = otherClient.getPhone();
+    }
+
+    @Override
+    public String toString() {
+        return name + " " + surname + " " + secondName;
     }
 }
