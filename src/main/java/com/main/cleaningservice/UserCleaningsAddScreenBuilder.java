@@ -136,14 +136,8 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
 
     private void resetDataAndQuit() {
         dateTimeInput.clear();
-        countryList.clear();
-        countryList.add(selectCountryPrompt);
         countryInput.setValue(selectCountryPrompt);
-        cityList.clear();
-        cityList.add(selectCityPrompt);
         cityInput.setValue(selectCityPrompt);
-        streetList.clear();
-        streetList.add(selectStreetPrompt);
         streetInput.setValue(selectStreetPrompt);
         buildingInput.clear();
         entranceInput.clear();
@@ -158,14 +152,8 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         incorrectFloorVisible.set(false);
         incorrectUnitVisible.set(false);
         incorrectServicesVisible.set(false);
-        countryList.clear();
-        placeTypeList.clear();
-        placeTypeList.add(selectPlaceTypePrompt);
         placeInput.setValue(selectPlaceTypePrompt);
-        cleaningTypeList.clear();
-        cleaningTypeList.add(selectCleaningTypePrompt);
         typeInput.setValue(selectCleaningTypePrompt);
-        serviceList.clear();
         exitScreen.run();
     }
 

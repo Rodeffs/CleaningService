@@ -2,7 +2,6 @@ package com.main.cleaningservice;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -38,7 +37,7 @@ public class LoginScreenBuilder implements Builder<Region> {
             Account loginAccount = adapter.selectAccount(loginInput.getText());
 
             if ((loginAccount != null) && passwordInput.getText().equals(loginAccount.getPassword())) {
-                account.setAccount(loginAccount);
+                account.set(loginAccount);
                 isLoggedIn.set(true);
 
                 loginInput.clear();

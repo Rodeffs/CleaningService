@@ -43,11 +43,11 @@ public class UserScreenBuilder implements Builder<Region> {
     }
 
     private void logInClient() {
-        if (!isLoggedIn.getValue())
+        if (!isLoggedIn.getValue() || account.getType().getName().equals("admin"))
             return;
 
         try {
-            client.setClient(adapter.selectClient(account));
+            client.set(adapter.selectClient(account));
             isClient.set(true);
 
         } catch (SQLException e) {

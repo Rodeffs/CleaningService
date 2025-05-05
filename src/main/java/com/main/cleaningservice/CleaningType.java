@@ -1,33 +1,53 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class CleaningType {
-    private int id;
-    private String name;
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final StringProperty name = new SimpleStringProperty();
+
+    public CleaningType() {
+        this.id.set(-1);
+        this.name.set("");
+    }
 
     public CleaningType(int id, String name) {
-        this.id = id;
-        this.name = name;
+        this.id.set(id);
+        this.name.set(name);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
+    }
+
+    public void set(CleaningType otherType) {
+        this.id.set(otherType.getId());
+        this.name.set(otherType.getName());
+    }
+
+    public void clear() {
+        this.id.set(-1);
+        this.name.set("");
     }
 
     @Override
     public String toString() {
-        return name;
+        return name.get();
     }
 
     @Override
@@ -37,6 +57,6 @@ public class CleaningType {
 
         CleaningType otherCleaningType = (CleaningType) otherObj;
 
-        return (id == otherCleaningType.getId()) && (name.equals(otherCleaningType.getName()));
+        return (id.get() == otherCleaningType.getId()) && (name.get().equals(otherCleaningType.getName()));
     }
 }

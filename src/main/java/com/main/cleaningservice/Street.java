@@ -1,22 +1,32 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Street {
-    private int id;
-    private City city;
-    private String name;
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final City city = new City();
+    private final StringProperty name = new SimpleStringProperty();
+
+    public Street() {
+        this.id.set(-1);
+        this.name.set("");
+    }
 
     public Street(int id, City city, String name) {
-        this.id = id;
-        this.city = city;
-        this.name = name;
+        this.id.set(id);
+        this.city.set(city);
+        this.name.set(name);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public City getCity() {
@@ -24,20 +34,32 @@ public class Street {
     }
 
     public void setCity(City city) {
-        this.city = city;
+        this.city.set(city);
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
+    }
+
+    public void set(Street otherStreet) {
+        this.id.set(otherStreet.getId());
+        this.city.set(otherStreet.getCity());
+        this.name.set(otherStreet.getName());
+    }
+
+    public void clear() {
+        this.id.set(-1);
+        this.city.clear();
+        this.name.set("");
     }
 
     @Override
     public String toString() {
-        return name;
+        return name.get();
     }
 
     @Override
@@ -47,6 +69,6 @@ public class Street {
 
         Street otherStreet = (Street) otherObj;
 
-        return (id == otherStreet.getId()) && (name.equals(otherStreet.getName())) && (city.equals(otherStreet.getCity()));
+        return (id.get() == otherStreet.getId()) && (name.get().equals(otherStreet.getName())) && (city.equals(otherStreet.getCity()));
     }
 }

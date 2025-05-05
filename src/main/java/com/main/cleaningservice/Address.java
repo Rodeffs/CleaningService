@@ -1,28 +1,39 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 public class Address {
-    private int id;
-    private Street street;
-    private int buildingNumber;
-    private int entranceNumber;
-    private int floorNumber;
-    private int unitNumber;
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final Street street = new Street();
+    private final IntegerProperty buildingNumber = new SimpleIntegerProperty();
+    private final IntegerProperty entranceNumber = new SimpleIntegerProperty();
+    private final IntegerProperty floorNumber = new SimpleIntegerProperty();
+    private final IntegerProperty unitNumber = new SimpleIntegerProperty();
+
+    public Address() {
+        this.id.set(-1);
+        this.buildingNumber.set(-1);
+        this.entranceNumber.set(-1);
+        this.floorNumber.set(-1);
+        this.unitNumber.set(-1);
+    }
 
     public Address(int id, Street street, int buildingNumber, int entranceNumber, int floorNumber, int unitNumber) {
-        this.id = id;
-        this.street = street;
-        this.buildingNumber = buildingNumber;
-        this.entranceNumber = entranceNumber;
-        this.floorNumber = floorNumber;
-        this.unitNumber = unitNumber;
+        this.id.set(id);
+        this.street.set(street);
+        this.buildingNumber.set(buildingNumber);
+        this.entranceNumber.set(entranceNumber);
+        this.floorNumber.set(floorNumber);
+        this.unitNumber.set(unitNumber);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public Street getStreet() {
@@ -30,39 +41,57 @@ public class Address {
     }
 
     public void setStreet(Street street) {
-        this.street = street;
+        this.street.set(street);
     }
 
     public int getBuildingNumber() {
-        return buildingNumber;
+        return buildingNumber.get();
     }
 
     public void setBuildingNumber(int buildingNumber) {
-        this.buildingNumber = buildingNumber;
+        this.buildingNumber.set(buildingNumber);
     }
 
     public int getEntranceNumber() {
-        return entranceNumber;
+        return entranceNumber.get();
     }
 
     public void setEntranceNumber(int entranceNumber) {
-        this.entranceNumber = entranceNumber;
+        this.entranceNumber.set(entranceNumber);
     }
 
     public int getFloorNumber() {
-        return floorNumber;
+        return floorNumber.get();
     }
 
     public void setFloorNumber(int floorNumber) {
-        this.floorNumber = floorNumber;
+        this.floorNumber.set(floorNumber);
     }
 
     public int getUnitNumber() {
-        return unitNumber;
+        return unitNumber.get();
     }
 
     public void setUnitNumber(int unitNumber) {
-        this.unitNumber = unitNumber;
+        this.unitNumber.set(unitNumber);
+    }
+
+    public void set(Address otherAddress) {
+        this.id.set(otherAddress.getId());
+        this.street.set(otherAddress.getStreet());
+        this.buildingNumber.set(otherAddress.getBuildingNumber());
+        this.entranceNumber.set(otherAddress.getEntranceNumber());
+        this.floorNumber.set(otherAddress.getFloorNumber());
+        this.unitNumber.set(otherAddress.getUnitNumber());
+    }
+
+    public void clear() {
+        this.id.set(-1);
+        this.street.clear();
+        this.buildingNumber.set(-1);
+        this.entranceNumber.set(-1);
+        this.floorNumber.set(-1);
+        this.unitNumber.set(-1);
     }
 
     @Override
@@ -77,6 +106,6 @@ public class Address {
 
         Address otherAddress = (Address) otherObj;
 
-        return (id == otherAddress.getId()) && (street.equals(otherAddress.getStreet())) && (buildingNumber == otherAddress.getBuildingNumber()) && (entranceNumber == otherAddress.getEntranceNumber()) && (floorNumber == otherAddress.getFloorNumber()) && (unitNumber == otherAddress.getUnitNumber());
+        return (id.get() == otherAddress.getId()) && (street.equals(otherAddress.getStreet())) && (buildingNumber.get() == otherAddress.getBuildingNumber()) && (entranceNumber.get() == otherAddress.getEntranceNumber()) && (floorNumber.get() == otherAddress.getFloorNumber()) && (unitNumber.get() == otherAddress.getUnitNumber());
     }
 }

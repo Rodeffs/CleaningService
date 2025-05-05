@@ -8,65 +8,60 @@ import javafx.beans.property.SimpleIntegerProperty;
 import java.sql.Timestamp;
 
 public class Cleaning {
-    private int id;
-    private Address address;
-    private PlaceType placeType;
-    private CleaningType cleaningType;
-    private Timestamp timestamp;
-    private DoubleProperty totalPrice;  // otherwise they won't get updated in table
-    private IntegerProperty cleanersAmount;
-    private Client client;
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final Address address = new Address();
+    private final PlaceType placeType = new PlaceType();
+    private final CleaningType cleaningType = new CleaningType();
+    private final Timestamp timestamp = new Timestamp(0);
+    private final DoubleProperty totalPrice = new SimpleDoubleProperty();
+    private final IntegerProperty cleanersAmount = new SimpleIntegerProperty();
+    private final Client client = new Client();
 
     public Cleaning() {
-        id = -1;
-        address = null;
-        placeType = null;
-        cleaningType = null;
-        timestamp = null;
-        totalPrice = new SimpleDoubleProperty(0.0);
-        cleanersAmount = new SimpleIntegerProperty(0);
-        client = null;
+        this.id.set(-1);
+        this.totalPrice.set(0.0);
+        this.cleanersAmount.set(0);
     }
 
     public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, double totalPrice, int cleanersAmount, Client client) {
-        this.id = id;
-        this.address = address;
-        this.placeType = placeType;
-        this.cleaningType = cleaningType;
-        this.timestamp = timestamp;
-        this.totalPrice = new SimpleDoubleProperty(totalPrice);
-        this.cleanersAmount = new SimpleIntegerProperty(cleanersAmount);
-        this.client = client;
+        this.id.set(id);
+        this.address.set(address);
+        this.placeType.set(placeType);
+        this.cleaningType.set(cleaningType);
+        this.timestamp.setTime(timestamp.getTime());
+        this.totalPrice.set(totalPrice);
+        this.cleanersAmount.set(cleanersAmount);
+        this.client.set(client);
     }
 
     public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, double totalPrice, Client client) {
-        this.id = id;
-        this.address = address;
-        this.placeType = placeType;
-        this.cleaningType = cleaningType;
-        this.timestamp = timestamp;
-        this.totalPrice = new SimpleDoubleProperty(totalPrice);
-        this.cleanersAmount = new SimpleIntegerProperty(0);
-        this.client = client;
+        this.id.set(id);
+        this.address.set(address);
+        this.placeType.set(placeType);
+        this.cleaningType.set(cleaningType);
+        this.timestamp.setTime(timestamp.getTime());
+        this.totalPrice.set(totalPrice);
+        this.cleanersAmount.set(0);
+        this.client.set(client);
     }
 
     public Cleaning(int id, Address address, PlaceType placeType, CleaningType cleaningType, Timestamp timestamp, Client client) {
-        this.id = id;
-        this.address = address;
-        this.placeType = placeType;
-        this.cleaningType = cleaningType;
-        this.timestamp = timestamp;
-        this.totalPrice = new SimpleDoubleProperty(0.0);
-        this.cleanersAmount = new SimpleIntegerProperty(0);
-        this.client = client;
+        this.id.set(id);
+        this.address.set(address);
+        this.placeType.set(placeType);
+        this.cleaningType.set(cleaningType);
+        this.timestamp.setTime(timestamp.getTime());
+        this.totalPrice.set(0.0);
+        this.cleanersAmount.set(0);
+        this.client.set(client);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public Address getAddress() {
@@ -74,7 +69,7 @@ public class Cleaning {
     }
 
     public void setAddress(Address address) {
-        this.address = address;
+        this.address.set(address);
     }
 
     public PlaceType getPlaceType() {
@@ -82,7 +77,7 @@ public class Cleaning {
     }
 
     public void setPlaceType(PlaceType placeType) {
-        this.placeType = placeType;
+        this.placeType.set(placeType);
     }
 
     public CleaningType getCleaningType() {
@@ -90,7 +85,7 @@ public class Cleaning {
     }
 
     public void setCleaningType(CleaningType cleaningType) {
-        this.cleaningType = cleaningType;
+        this.cleaningType.set(cleaningType);
     }
 
     public Timestamp getTimestamp() {
@@ -98,7 +93,7 @@ public class Cleaning {
     }
 
     public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp.setTime(timestamp.getTime());
     }
 
     public double getTotalPrice() {
@@ -109,14 +104,6 @@ public class Cleaning {
         this.totalPrice.set(totalPrice);
     }
 
-    public DoubleProperty getTotalPriceProperty() {
-        return totalPrice;
-    }
-
-    public void setTotalPriceProperty(DoubleProperty totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
     public int getCleanersAmount() {
         return cleanersAmount.getValue();
     }
@@ -125,41 +112,33 @@ public class Cleaning {
         this.cleanersAmount.set(cleanersAmount);
     }
 
-    public IntegerProperty getCleanersAmountProperty() {
-        return cleanersAmount;
-    }
-
-    public void setCleanersAmountProperty(IntegerProperty cleanersAmount) {
-        this.cleanersAmount = cleanersAmount;
-    }
-
     public Client getClient() {
         return client;
     }
 
     public void setClient(Client client) {
-        this.client = client;
+        this.client.set(client);
     }
 
-    public void setCleaning(Cleaning otherCleaning) {
-        id = otherCleaning.getId();
-        address = otherCleaning.getAddress();
-        placeType = otherCleaning.getPlaceType();
-        cleaningType = otherCleaning.getCleaningType();
-        timestamp = otherCleaning.getTimestamp();
-        totalPrice = otherCleaning.getTotalPriceProperty();
-        cleanersAmount = otherCleaning.getCleanersAmountProperty();
-        client = otherCleaning.getClient();
+    public void set(Cleaning otherCleaning) {
+        this.id.set(otherCleaning.getId());
+        this.address.set(otherCleaning.getAddress());
+        this.placeType.set(otherCleaning.getPlaceType());
+        this.cleaningType.set(otherCleaning.getCleaningType());
+        this.timestamp.setTime(timestamp.getTime());
+        this.totalPrice.set(otherCleaning.getTotalPrice());
+        this.cleanersAmount.set(otherCleaning.getCleanersAmount());
+        this.client.set(otherCleaning.getClient());
     }
 
     public void clear() {
-        id = -1;
-        address = null;
-        placeType = null;
-        cleaningType = null;
-        timestamp = null;
-        totalPrice = new SimpleDoubleProperty(0.0);
-        cleanersAmount = new SimpleIntegerProperty(0);
-        client = null;
+        this.id.set(-1);
+        this.address.clear();
+        this.placeType.clear();
+        this.cleaningType.clear();
+        this.timestamp.setTime(0);
+        this.totalPrice.set(0.0);
+        this.cleanersAmount.set(0);
+        this.client.clear();
     }
 }

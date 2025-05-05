@@ -3,7 +3,6 @@ package com.main.cleaningservice;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -62,7 +61,7 @@ public class RegistrationScreenBuilder implements Builder<Region> {
                     incorrectInputVisible.set(false);
 
                     adapter.insertAccount(login, password, displayName);
-                    account.setAccount(adapter.selectAccount(login));
+                    account.set(adapter.selectAccount(login));
 
                     ClientType type = adapter.selectClientType(clientType);
                     adapter.insertClient(name, surname, secondName, type, account, email, phone);

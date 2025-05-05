@@ -80,7 +80,7 @@ public class AdminCleaningsEditScreenBuilder implements Builder<Region> {
         if (cleaningsTable.getSelectionModel().getSelectedItem() == null)
             return;
 
-        selectedCleaning.setCleaning(cleaningsTable.getSelectionModel().getSelectedItem());
+        selectedCleaning.set(cleaningsTable.getSelectionModel().getSelectedItem());
 
         try {
             countryList.clear();
@@ -192,7 +192,6 @@ public class AdminCleaningsEditScreenBuilder implements Builder<Region> {
         incorrectUnitVisible.set(false);
         incorrectServicesVisible.set(false);
         previouslySelectedServices.clear();
-        countryList.clear();
         placeTypeList.clear();
         placeTypeList.add(selectPlaceTypePrompt);
         placeInput.setValue(selectPlaceTypePrompt);

@@ -1,67 +1,70 @@
 package com.main.cleaningservice;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Client {
-    private int id;
-    private String name;
-    private String surname;
-    private String secondName;
-    private ClientType type;
-    private Account account;
-    private String email;
-    private String phone;
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final StringProperty name = new SimpleStringProperty();
+    private final StringProperty surname = new SimpleStringProperty();
+    private final StringProperty secondName = new SimpleStringProperty();
+    private final ClientType type = new ClientType();
+    private final Account account = new Account();
+    private final StringProperty email = new SimpleStringProperty();
+    private final StringProperty phone = new SimpleStringProperty();
 
     public Client() {
-        id = -1;
-        name = null;
-        surname = null;
-        secondName = null;
-        type = null;
-        account = null;
-        email = null;
-        phone = null;
+        this.id.set(-1);
+        this.name.set("");
+        this.surname.set("");
+        this.secondName.set("");
+        this.email.set("");
+        this.phone.set("");
     }
 
     public Client(int id, String name, String surname, String secondName, ClientType type, Account account, String email, String phone) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.secondName = secondName;
-        this.type = type;
-        this.account = account;
-        this.email = email;
-        this.phone = phone;
+        this.id.set(id);
+        this.name.set(name);
+        this.surname.set(surname);
+        this.secondName.set(secondName);
+        this.type.set(type);
+        this.account.set(account);
+        this.email.set(email);
+        this.phone.set(phone);
     }
 
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.id.set(id);
     }
 
     public String getName() {
-        return name;
+        return name.get();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public String getSurname() {
-        return surname;
+        return surname.get();
     }
 
     public void setSurname(String surname) {
-        this.surname = surname;
+        this.surname.set(surname);
     }
 
     public String getSecondName() {
-        return secondName;
+        return secondName.get();
     }
 
     public void setSecondName(String secondName) {
-        this.secondName = secondName;
+        this.secondName.set(secondName);
     }
 
     public ClientType getType() {
@@ -69,7 +72,7 @@ public class Client {
     }
 
     public void setType(ClientType type) {
-        this.type = type;
+        this.type.set(type);
     }
 
     public Account getAccount() {
@@ -77,44 +80,49 @@ public class Client {
     }
 
     public void setAccount(Account account) {
-        this.account = account;
+        this.account.set(account);
     }
 
     public String getEmail() {
-        return email;
+        return email.get();
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email.set(email);
     }
 
     public String getPhone() {
-        return phone;
+        return phone.get();
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phone.set(phone);
+    }
+
+    public void set(Client otherClient) {
+        this.id.set(otherClient.getId());
+        this.name.set(otherClient.getName());
+        this.surname.set(otherClient.getSurname());
+        this.secondName.set(otherClient.getSecondName());
+        this.type.set(otherClient.getType());
+        this.account.set(otherClient.getAccount());
+        this.email.set(otherClient.getEmail());
+        this.phone.set(otherClient.getPhone());
     }
 
     public void clear() {
-        id = -1;
-        name = null;
-        surname = null;
-        secondName = null;
-        type = null;
-        account = null;
-        email = null;
-        phone = null;
+        this.id.set(-1);
+        this.name.set("");
+        this.surname.set("");
+        this.secondName.set("");
+        this.type.clear();
+        this.account.clear();
+        this.email.set("");
+        this.phone.set("");
     }
 
-    public void setClient(Client otherClient) {
-        id = otherClient.getId();
-        name = otherClient.getName();
-        surname = otherClient.getSurname();
-        secondName = otherClient.getSecondName();
-        type = otherClient.getType();
-        account = otherClient.getAccount();
-        email = otherClient.getEmail();
-        phone = otherClient.getPhone();
+    @Override
+    public String toString() {
+        return name.get() + " " + surname.get() + " " + secondName.get();
     }
 }
