@@ -198,13 +198,16 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
     private boolean checkValidity() {
         boolean inputIsCorrect = true;
 
-        // Checking date and time
+        // Checking date and time (can't be before today and can't be after 5 years)
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date parsed = dateFormat.parse(dateTimeInput.getText());
             Timestamp dateTime = new Timestamp(parsed.getTime());
-            incorrectDateTimeVisible.set(false);
+
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            Timestamp fiveYears = new Timestamp(System.currentTimeMillis() + 1000*60*60*24*365*5);
+            incorrectDateTimeVisible.set(dateTime.before(now) || dateTime.after(fiveYears));
 
         } catch (ParseException e) {
             incorrectDateTimeVisible.set(true);

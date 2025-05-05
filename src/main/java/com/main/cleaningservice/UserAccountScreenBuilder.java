@@ -27,6 +27,18 @@ public class UserAccountScreenBuilder implements Builder<Region> {
     private final BooleanProperty isClient;
 
     private final BooleanProperty incorrectLoginVisible = new SimpleBooleanProperty(false);
+    private final BooleanProperty emptyFieldsVisible = new SimpleBooleanProperty(false);
+
+    private final TextField loginInput = new TextField();
+    private final TextField passwordInput = new TextField();
+    private final TextField displayNameInput = new TextField();
+    private final TextField nameInput = new TextField();
+    private final TextField surnameInput = new TextField();
+    private final TextField secondNameInput = new TextField();
+    private final ArrayList<ClientType> clientTypes = new ArrayList<>();
+    private final ComboBox<ClientType> clientTypeInput = new ComboBox<>();
+    private final TextField emailInput = new TextField();
+    private final TextField phoneInput = new TextField();
 
     public UserAccountScreenBuilder(Stage stage, Account account, BooleanProperty isLoggedIn, Client client, BooleanProperty isClient, DBAdapter adapter) {
         this.stage = stage;
@@ -37,63 +49,83 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         this.adapter = adapter;
     }
 
-    private void updateInfo(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+    private boolean checkInput() {
+        boolean inputIsCorrect =
+                (loginInput.getText() != null) && !loginInput.getText().isEmpty() &&
+                (passwordInput.getText() != null) && !passwordInput.getText().isEmpty() &&
+                (displayNameInput.getText() != null) && !displayNameInput.getText().isEmpty() &&
+                (surnameInput.getText() != null) && !surnameInput.getText().isEmpty() &&
+                (secondNameInput.getText() != null) && !secondNameInput.getText().isEmpty() &&
+                (emailInput.getText() != null) && !emailInput.getText().isEmpty() &&
+                (phoneInput.getText() != null) && !phoneInput.getText().isEmpty();
+
+        emptyFieldsVisible.set(!inputIsCorrect);
+
+        try {
+            if (!loginInput.getText().equals(account.getLogin()) && (adapter.selectAccount(loginInput.getText()) != null)) {
+                incorrectLoginVisible.set(true);
+                inputIsCorrect = false;
+            }
+            else
+                incorrectLoginVisible.set(false);
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return inputIsCorrect;
+    }
+
+    private void updateInfo() {
         if (!isLoggedIn.getValue() || !isClient.getValue())
             return;
 
-        String newLogin = loginInput.getText();
+        if (checkInput()) {
+            try {
+                String newLogin = loginInput.getText();
+                String newPassword = passwordInput.getText();
+                String newDisplayName = displayNameInput.getText();
+                String newName = nameInput.getText();
+                String newSurname = surnameInput.getText();
+                String newSecondName = secondNameInput.getText();
+                ClientType newClientType = clientTypeInput.getValue();
+                String newEmail = emailInput.getText();
+                String newPhone = phoneInput.getText();
 
-        try {
+                if (!newLogin.equals(account.getLogin()))
+                    adapter.updateAccountLogin(account, newLogin);
 
-            if (!newLogin.equals(account.getLogin()) && (adapter.selectAccount(newLogin) != null)) {
-                incorrectLoginVisible.set(true);
-                return;
+                if (!newPassword.equals(account.getPassword()))
+                    adapter.updateAccountPassword(account, newPassword);
+
+                if (!newDisplayName.equals(account.getDisplayName()))
+                    adapter.updateAccountDisplayName(account, newDisplayName);
+
+                if (!newName.equals(client.getName()))
+                    adapter.updateClientName(client, newName);
+
+                if (!newSurname.equals(client.getSurname()))
+                    adapter.updateClientSurname(client, newSurname);
+
+                if (!newSecondName.equals(client.getSecondName()))
+                    adapter.updateClientSecondName(client, newSecondName);
+
+                if (!newClientType.equals(client.getType()))
+                    adapter.updateClientType(client, newClientType);
+
+                if (!newEmail.equals(client.getEmail()))
+                    adapter.updateClientEmail(client, newEmail);
+
+                if (!newPhone.equals(client.getPhone()))
+                    adapter.updateClientPhone(client, newPhone);
+
+            } catch (SQLException e) {
+                throw new RuntimeException();
             }
-
-            incorrectLoginVisible.set(false);
-
-            String newPassword = passwordInput.getText();
-            String newDisplayName = displayNameInput.getText();
-            String newName = nameInput.getText();
-            String newSurname = surnameInput.getText();
-            String newSecondName = secondNameInput.getText();
-            ClientType newClientType = adapter.selectClientType(clientTypeInput.getValue());
-            String newEmail = emailInput.getText();
-            String newPhone = phoneInput.getText();
-
-            if (!newLogin.equals(account.getLogin()))
-                adapter.updateAccountLogin(account, newLogin);
-
-            if (!newPassword.equals(account.getPassword()))
-                adapter.updateAccountPassword(account, newPassword);
-
-            if (!newDisplayName.equals(account.getDisplayName()))
-                adapter.updateAccountDisplayName(account, newDisplayName);
-
-            if (!newName.equals(client.getName()))
-                adapter.updateClientName(client, newName);
-
-            if (!newSurname.equals(client.getSurname()))
-                adapter.updateClientSurname(client, newSurname);
-
-            if (!newSecondName.equals(client.getSecondName()))
-                adapter.updateClientSecondName(client, newSecondName);
-
-            if (!newClientType.equals(client.getType()))
-                adapter.updateClientType(client, newClientType);
-
-            if (!newEmail.equals(client.getEmail()))
-                adapter.updateClientEmail(client, newEmail);
-
-            if (!newPhone.equals(client.getPhone()))
-                adapter.updateClientPhone(client, newPhone);
-
-        } catch (SQLException e) {
-            throw new RuntimeException();
         }
     }
 
-    private void displayInfo(TextField loginInput, TextField passwordInput, TextField displayNameInput, TextField nameInput, TextField surnameInput, TextField secondNameInput, ComboBox<String> clientTypeInput, TextField emailInput, TextField phoneInput) {
+    private void displayInfo() {
         if (!isLoggedIn.getValue() || !isClient.getValue())
             return;
 
@@ -103,7 +135,7 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         nameInput.setText(client.getName());
         surnameInput.setText(client.getSurname());
         secondNameInput.setText(client.getSecondName());
-        clientTypeInput.setValue(client.getType().getName());
+        clientTypeInput.setValue(client.getType());
         emailInput.setText(client.getEmail());
         phoneInput.setText(client.getPhone());
     }
@@ -112,6 +144,8 @@ public class UserAccountScreenBuilder implements Builder<Region> {
     public Region build() {
         GridPane window = new GridPane();
 
+        window.prefHeightProperty().bind(stage.heightProperty());
+        window.prefWidthProperty().bind(stage.widthProperty());
         window.setAlignment(Pos.CENTER);
         window.setHgap(10);
         window.setVgap(10);
@@ -121,10 +155,7 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         accountInfoText.setFont(Font.font("Verdana", 50));
         window.add(accountInfoText, 0, 0, 2, 1);
 
-        Label loginLabel = new Label("Login:");
-        window.add(loginLabel, 0, 1);
-
-        TextField loginInput = new TextField();
+        window.add(new Label("Login:"), 0, 1);
         window.add(loginInput, 1, 1);
 
         Text incorrectLoginText = new Text("This login is already in use");
@@ -133,66 +164,41 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         incorrectLoginText.visibleProperty().bind(incorrectLoginVisible);
         window.add(incorrectLoginText, 2, 1);
 
-        Label passwordLabel = new Label("Password:");
-        window.add(passwordLabel, 0, 2);
-
-        TextField passwordInput = new TextField();
+        window.add(new Label("Password:"), 0, 2);
         window.add(passwordInput, 1, 2);
 
-        Label displayNameLabel = new Label("Display name:");
-        window.add(displayNameLabel, 0, 3);
-
-        TextField displayNameInput = new TextField();
+        window.add(new Label("Display name:"), 0, 3);
         window.add(displayNameInput, 1, 3);
 
-        Label nameLabel = new Label("Real name:");
-        window.add(nameLabel, 0, 4);
-
-        TextField nameInput = new TextField();
+        window.add(new Label("Real name:"), 0, 4);
         window.add(nameInput, 1, 4);
 
-        Label surnameLabel = new Label("Surname:");
-        window.add(surnameLabel, 0, 5);
-
-        TextField surnameInput = new TextField();
+        window.add(new Label("Surname:"), 0, 5);
         window.add(surnameInput, 1, 5);
 
-        Label secondNameLabel = new Label("Second name:");
-        window.add(secondNameLabel, 0, 6);
-
-        TextField secondNameInput = new TextField();
+        window.add(new Label("Second name:"), 0, 6);
         window.add(secondNameInput, 1, 6);
 
-        Label clientTypeLabel = new Label("Type:");
-        window.add(clientTypeLabel, 0, 7);
-
-        ArrayList<String> clientTypes = new ArrayList<String>();
+        window.add(new Label("Type:"), 0, 7);
 
         try {
-            for (ClientType clientType : adapter.selectClientTypes())
-                clientTypes.add(clientType.toString());
+            clientTypes.addAll(adapter.selectClientTypes());
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        ComboBox<String> clientTypeInput = new ComboBox<String>(FXCollections.observableArrayList(clientTypes));
+        clientTypeInput.setItems(FXCollections.observableArrayList(clientTypes));
         window.add(clientTypeInput, 1, 7);
 
-        Label emailLabel = new Label("Email:");
-        window.add(emailLabel, 0, 8);
-
-        TextField emailInput = new TextField();
+        window.add(new Label("Email:"), 0, 8);
         window.add(emailInput, 1, 8);
 
-        Label phoneLabel = new Label("Phone:");
-        window.add(phoneLabel, 0, 9);
-
-        TextField phoneInput = new TextField();
+        window.add(new Label("Phone:"), 0, 9);
         window.add(phoneInput, 1, 9);
 
         Button saveButton = new Button("Save Changes");
-        saveButton.setOnAction(e -> updateInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+        saveButton.setOnAction(e -> updateInfo());
 
         HBox saveBox = new HBox(10);
         saveBox.setAlignment(Pos.BOTTOM_LEFT);
@@ -200,14 +206,20 @@ public class UserAccountScreenBuilder implements Builder<Region> {
         window.add(saveBox,0, 10);
 
         Button resetButton = new Button("Reset Changes");
-        resetButton.setOnAction(e -> displayInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+        resetButton.setOnAction(e -> displayInfo());
 
         HBox resetBox = new HBox(10);
         resetBox.setAlignment(Pos.BOTTOM_RIGHT);
         resetBox.getChildren().add(resetButton);
         window.add(resetBox, 1, 10);
 
-        isClient.addListener((ob, oldVal, newVal) -> displayInfo(loginInput, passwordInput, displayNameInput, nameInput, surnameInput, secondNameInput, clientTypeInput, emailInput, phoneInput));
+        Text emptyFieldsText = new Text("Some fields are empty!");
+        emptyFieldsText.setFont(Font.font("Verdana", 20));
+        emptyFieldsText.setFill(Color.RED);
+        emptyFieldsText.visibleProperty().bind(emptyFieldsVisible);
+        window.add(emptyFieldsText, 0, 11, 1, 2);
+
+        isClient.addListener((ob, oldVal, newVal) -> displayInfo());
 
         return new ScrollPane(window);
     }
