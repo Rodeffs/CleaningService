@@ -39,4 +39,14 @@ public class Street {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof Street))
+            return false;
+
+        Street otherStreet = (Street) otherObj;
+
+        return (id == otherStreet.getId()) && (name.equals(otherStreet.getName())) && (city.equals(otherStreet.getCity()));
+    }
 }

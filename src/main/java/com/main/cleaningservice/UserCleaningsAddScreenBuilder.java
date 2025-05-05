@@ -30,9 +30,9 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
 
     private final Country selectCountryPrompt = new Country(-1, "Select Country");
     private final ObservableList<Country> countryList = FXCollections.observableArrayList(selectCountryPrompt);
-    private final City selectCityPrompt = new City(-1, null, "Select City");
+    private final City selectCityPrompt = new City(-1, selectCountryPrompt, "Select City");
     private final ObservableList<City> cityList = FXCollections.observableArrayList(selectCityPrompt);
-    private final Street selectStreetPrompt = new Street(-1, null, "Select Street");
+    private final Street selectStreetPrompt = new Street(-1, selectCityPrompt, "Select Street");
     private final ObservableList<Street> streetList = FXCollections.observableArrayList(selectStreetPrompt);
     private final PlaceType selectPlaceTypePrompt = new PlaceType(-1, "Select Place Type");
     private final ObservableList<PlaceType> placeTypeList = FXCollections.observableArrayList(selectPlaceTypePrompt);
@@ -87,38 +87,36 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
     private void selectCountry() {
         Country selectedCountry = countryInput.getSelectionModel().getSelectedItem();
 
-        if (selectedCountry != selectCountryPrompt) {
+        cityList.clear();
+        cityList.add(selectCityPrompt);
+        cityInput.setValue(selectCityPrompt);
+
+        streetList.clear();
+        streetList.add(selectStreetPrompt);
+        streetInput.setValue(selectStreetPrompt);
+
+        if (!(selectedCountry == null) && !selectedCountry.equals(selectCountryPrompt)) {
             try {
                 cityList.addAll(adapter.selectCities(selectedCountry));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
-        else {
-            cityList.clear();
-            cityList.add(selectCityPrompt);
-            cityInput.setValue(selectCityPrompt);
-
-            streetList.clear();
-            streetList.add(selectStreetPrompt);
-            streetInput.setValue(selectStreetPrompt);
-        }
     }
 
     private void selectCity() {
         City selectedCity = cityInput.getSelectionModel().getSelectedItem();
 
-        if (selectedCity != selectCityPrompt) {
+        streetList.clear();
+        streetList.add(selectStreetPrompt);
+        streetInput.setValue(selectStreetPrompt);
+
+        if (!(selectedCity == null) && !selectedCity.equals(selectCityPrompt)) {
             try {
                 streetList.addAll(adapter.selectStreets(selectedCity));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }
-        else {
-            streetList.clear();
-            streetList.add(selectStreetPrompt);
-            streetInput.setValue(selectStreetPrompt);
         }
     }
 
@@ -160,29 +158,16 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         exitScreen.run();
     }
 
-    private void order() {
+    private boolean checkValidity() {
         boolean inputIsCorrect = true;
 
-        String dateTimeString = dateTimeInput.getText();
-        Timestamp dateTime = null;
-        Country country = countryInput.getSelectionModel().getSelectedItem();
-        City city = cityInput.getSelectionModel().getSelectedItem();
-        Street street = streetInput.getSelectionModel().getSelectedItem();
-        int buildingNumber = -1;
-        int entranceNumber = -1;
-        int floorNumber = 1001;
-        int unitNumber = -1;
-        PlaceType placeType = placeInput.getSelectionModel().getSelectedItem();
-        CleaningType cleaningType = typeInput.getSelectionModel().getSelectedItem();
-        ObservableList<Service> services = serviceSelection.getSelectionModel().getSelectedItems();
-        double totalPrice = Double.parseDouble(totalPriceOutput.getText());
-
-        // Parsing string input to Timestamp
+        // Checking date and time
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date parsed = dateFormat.parse(dateTimeString);
-            dateTime = new Timestamp(parsed.getTime());
+            Date parsed = dateFormat.parse(dateTimeInput.getText());
+            Timestamp dateTime = new Timestamp(parsed.getTime());
+            incorrectDateTimeVisible.set(false);
 
         } catch (ParseException e) {
             incorrectDateTimeVisible.set(true);
@@ -191,22 +176,32 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
 
         // Checking selectable values
 
-        if ((country == selectCountryPrompt) || (city == selectCityPrompt) || (street == selectStreetPrompt) || (placeType == selectPlaceTypePrompt) || (cleaningType == selectCleaningTypePrompt)) {
+        Country country = countryInput.getSelectionModel().getSelectedItem();
+        City city = cityInput.getSelectionModel().getSelectedItem();
+        Street street = streetInput.getSelectionModel().getSelectedItem();
+        PlaceType placeType = placeInput.getSelectionModel().getSelectedItem();
+        CleaningType cleaningType = typeInput.getSelectionModel().getSelectedItem();
+
+        if ((country.equals(selectCountryPrompt)) || (city.equals(selectCityPrompt)) || (street.equals(selectStreetPrompt)) || (placeType.equals(selectPlaceTypePrompt)) || (cleaningType.equals(selectCleaningTypePrompt))) {
             incorrectInputVisible.set(true);
             inputIsCorrect = false;
         }
+        else
+            incorrectInputVisible.set(false);
 
         // Checking building number
 
         try {
-            buildingNumber = Integer.parseInt(buildingInput.getText());
+            int buildingNumber = Integer.parseInt(buildingInput.getText());
+
+            if ((buildingNumber < 0) || (buildingNumber > 1000)) {
+                incorrectBuildingVisible.set(true);
+                inputIsCorrect = false;
+            }
+            else
+                incorrectBuildingVisible.set(false);
 
         } catch (NumberFormatException e) {
-            incorrectBuildingVisible.set(true);
-            inputIsCorrect = false;
-        }
-
-        if ((buildingNumber < 0) || (buildingNumber > 1000)) {
             incorrectBuildingVisible.set(true);
             inputIsCorrect = false;
         }
@@ -214,14 +209,16 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         // Checking entrance number
 
         try {
-            entranceNumber = Integer.parseInt(entranceInput.getText());
+            int entranceNumber = Integer.parseInt(entranceInput.getText());
+
+            if ((entranceNumber < 0) || (entranceNumber > 1000)) {
+                incorrectEntranceVisible.set(true);
+                inputIsCorrect = false;
+            }
+            else
+                incorrectEntranceVisible.set(false);
 
         } catch (NumberFormatException e) {
-            incorrectEntranceVisible.set(true);
-            inputIsCorrect = false;
-        }
-
-        if ((entranceNumber < 0) || (entranceNumber > 1000)) {
             incorrectEntranceVisible.set(true);
             inputIsCorrect = false;
         }
@@ -229,14 +226,16 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         // Checking floor number
 
         try {
-            floorNumber = Integer.parseInt(floorInput.getText());
+            int floorNumber = Integer.parseInt(floorInput.getText());
+
+            if ((floorNumber < -1000) || (floorNumber > 1000)) {
+                incorrectFloorVisible.set(true);
+                inputIsCorrect = false;
+            }
+            else
+                incorrectFloorVisible.set(false);
 
         } catch (NumberFormatException e) {
-            incorrectFloorVisible.set(true);
-            inputIsCorrect = false;
-        }
-
-        if ((floorNumber < -1000) || (floorNumber > 1000)) {
             incorrectFloorVisible.set(true);
             inputIsCorrect = false;
         }
@@ -244,24 +243,54 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         // Checking unit number
 
         try {
-            unitNumber = Integer.parseInt(unitInput.getText());
+            int unitNumber = Integer.parseInt(unitInput.getText());
+
+            if ((unitNumber < 0) || (unitNumber > 10000)) {
+                incorrectUnitVisible.set(true);
+                inputIsCorrect = false;
+            }
+            else
+                incorrectUnitVisible.set(false);
 
         } catch (NumberFormatException e) {
             incorrectUnitVisible.set(true);
             inputIsCorrect = false;
         }
 
-        if ((unitNumber < 0) || (unitNumber > 10000)) {
-            incorrectUnitVisible.set(true);
-            inputIsCorrect = false;
-        }
+        // Checking selected services
 
-        if ((services.isEmpty()) || (totalPrice == 0.0)) {
+        ObservableList<Service> services = serviceSelection.getSelectionModel().getSelectedItems();
+
+        if ((services.isEmpty())) {
             incorrectServicesVisible.set(true);
             inputIsCorrect = false;
         }
+        else
+            incorrectServicesVisible.set(false);
 
-        if (inputIsCorrect) {
+        return inputIsCorrect;
+    }
+
+    private void order() {
+        if (checkValidity()) {
+            Timestamp dateTime = null;
+            int buildingNumber = Integer.parseInt(buildingInput.getText());
+            int entranceNumber = Integer.parseInt(entranceInput.getText());
+            int floorNumber = Integer.parseInt(floorInput.getText());
+            int unitNumber = Integer.parseInt(unitInput.getText());
+            Street street = streetInput.getSelectionModel().getSelectedItem();
+            PlaceType placeType = placeInput.getSelectionModel().getSelectedItem();
+            CleaningType cleaningType = typeInput.getSelectionModel().getSelectedItem();
+            ObservableList<Service> services = serviceSelection.getSelectionModel().getSelectedItems();
+            double totalPrice = Double.parseDouble(totalPriceOutput.getText());
+
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date parsed = dateFormat.parse(dateTimeInput.getText());
+                dateTime = new Timestamp(parsed.getTime());
+
+            } catch (ParseException e) {}
+
             try {
                 Address address = adapter.selectAddress(street, buildingNumber, entranceNumber, floorNumber, unitNumber);
 
@@ -275,7 +304,6 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
                 // This is absolutely awful, but I don't have any other way to get the ID of a new cleaning entry, since ID is the only truly unique thing about it
 
                 Cleaning orderedCleaning = adapter.selectCleaning(address, placeType, cleaningType, dateTime, client);
-
                 if (orderedCleaning == null)
                     throw new RuntimeException("Cannot fetch newly added cleaning");
 
@@ -284,11 +312,11 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
 
                 cleaningsList.add(orderedCleaning);
 
-                resetDataAndQuit();
-
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+
+            resetDataAndQuit();
         }
     }
 
@@ -382,7 +410,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         window.add(serviceSelection, 1, 11);
 
         serviceSelection.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        serviceSelection.selectionModelProperty().addListener((ob, oldVal, newVal) -> calculatePrice());
+        serviceSelection.getSelectionModel().selectedItemProperty().addListener((ob, oldVal, newVal) -> calculatePrice());
 
         Text incorrectServicesText = new Text("You must select at least one service!");
         incorrectServicesText.setFont(Font.font("Verdana", 20));
@@ -410,7 +438,7 @@ public class UserCleaningsAddScreenBuilder implements Builder<Region> {
         cancelBox.getChildren().add(cancelButton);
         window.add(cancelBox, 1, 13);
 
-        Text incorrectInputText = new Text("Some fields are empty!");
+        Text incorrectInputText = new Text("Some selectable fields are empty!");
         incorrectInputText.setFont(Font.font("Verdana", 20));
         incorrectInputText.setFill(Color.RED);
         incorrectInputText.visibleProperty().bind(incorrectInputVisible);

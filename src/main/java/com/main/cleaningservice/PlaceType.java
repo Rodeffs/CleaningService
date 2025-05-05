@@ -29,4 +29,14 @@ public class PlaceType {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof PlaceType))
+            return false;
+
+        PlaceType otherPlaceType = (PlaceType) otherObj;
+
+        return (id == otherPlaceType.getId()) && (name.equals(otherPlaceType.getName()));
+    }
 }

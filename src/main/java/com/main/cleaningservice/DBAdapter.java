@@ -616,7 +616,7 @@ public class DBAdapter {
     // CLEANING SERVICES
 
     public void insertCleaningService(Cleaning cleaning, Service service) throws SQLException {
-        String sql = "INSERT INTO cleaning_services(cleaning_id, service_id) VALUES (" + cleaning.getId() + ", " + service.getId();
+        String sql = "INSERT INTO cleaning_services(cleaning_id, service_id) VALUES (" + cleaning.getId() + ", " + service.getId() + ")";
         executeStatement(sql);
         System.out.println("Cleaning " + cleaning.getId() + " added service " + service.getId());
     }

@@ -39,4 +39,14 @@ public class City {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object otherObject) {
+        if ((otherObject == null) || !(otherObject instanceof City))
+            return false;
+
+        City otherCity = (City) otherObject;
+
+        return (id == otherCity.getId()) && (name.equals(otherCity.getName())) && (country.equals(otherCity.getCountry()));
+    }
 }

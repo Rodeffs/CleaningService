@@ -29,4 +29,14 @@ public class Country {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof Country))
+            return false;
+
+        Country otherCountry = (Country) otherObj;
+
+        return (id == otherCountry.getId()) && (name.equals(otherCountry.getName()));
+    }
 }

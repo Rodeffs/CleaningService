@@ -29,4 +29,14 @@ public class CleaningType {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof CleaningType))
+            return false;
+
+        CleaningType otherCleaningType = (CleaningType) otherObj;
+
+        return (id == otherCleaningType.getId()) && (name.equals(otherCleaningType.getName()));
+    }
 }
