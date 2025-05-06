@@ -96,7 +96,7 @@ public class Address {
 
     @Override
     public String toString() {
-        return street.getCity().getCountry().getName() + "\n" + street.getCity().getName() + "\n" + street.getName() + ", " + buildingNumber + "\nEntrance " + entranceNumber + "\nFloor " + floorNumber + "\nUnit " + unitNumber;
+        return street.getCity().getCountry().getName() + "\n" + street.getCity().getName() + "\n" + street.getName() + ", " + buildingNumber.get() + "\nEntrance " + entranceNumber + "\nFloor " + floorNumber.get() + "\nUnit " + unitNumber.get();
     }
 
     @Override

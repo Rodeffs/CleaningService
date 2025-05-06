@@ -126,9 +126,4 @@ public class Client {
     public String toString() {
         return name.get() + " " + surname.get() + " " + secondName.get();
     }
-
-    @Override
-    public String toString() {
-        return name + " " + surname + " " + secondName;
-    }
 }

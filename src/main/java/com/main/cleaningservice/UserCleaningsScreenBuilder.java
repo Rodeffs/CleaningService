@@ -97,43 +97,43 @@ public class UserCleaningsScreenBuilder implements Builder<Region> {
 
         window.setCenter(new StackPane(tableScreen, tableAddScreen, tableEditScreen));
 
-        TableColumn<Cleaning, String> dateTimeCol = new TableColumn<>("Date & Time");
+        TableColumn<Cleaning, Timestamp> dateTimeCol = new TableColumn<>("Date & Time");
         dateTimeCol.prefWidthProperty().bind(stage.widthProperty().divide(6));
 
         // The following code is used to sync the table contents with the Cleaning class
         // Whenever the Timestamp of class Cleaning is updated it will use call()
-        // ReadOnlyObjectWrapper is used to wrap the Timestamp string value to make it observable
+        // ReadOnlyObjectWrapper is used to wrap the Timestamp value to make it observable
 
-        dateTimeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Cleaning, String> cleaning) {
-                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getTimestamp().toString());
+        dateTimeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, Timestamp>, ObservableValue<Timestamp>>() {
+            public ObservableValue<Timestamp> call(TableColumn.CellDataFeatures<Cleaning, Timestamp> cleaning) {
+                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getTimestamp());
             }
         });
 
-        TableColumn<Cleaning, String> addressCol = new TableColumn<>("Address");
+        TableColumn<Cleaning, Address> addressCol = new TableColumn<>("Address");
         addressCol.prefWidthProperty().bind(stage.widthProperty().divide(6));
 
-        addressCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Cleaning, String> cleaning) {
-                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getAddress().toString());
+        addressCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, Address>, ObservableValue<Address>>() {
+            public ObservableValue<Address> call(TableColumn.CellDataFeatures<Cleaning, Address> cleaning) {
+                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getAddress());
             }
         });
 
-        TableColumn<Cleaning, String> placeTypeCol = new TableColumn<>("Place Type");
+        TableColumn<Cleaning, PlaceType> placeTypeCol = new TableColumn<>("Place Type");
         placeTypeCol.prefWidthProperty().bind(stage.widthProperty().divide(6));
 
-        placeTypeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Cleaning, String> cleaning) {
-                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getPlaceType().toString());
+        placeTypeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, PlaceType>, ObservableValue<PlaceType>>() {
+            public ObservableValue<PlaceType> call(TableColumn.CellDataFeatures<Cleaning, PlaceType> cleaning) {
+                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getPlaceType());
             }
         });
 
-        TableColumn<Cleaning, String> cleaningTypeCol = new TableColumn<>("Cleaning Type");
+        TableColumn<Cleaning, CleaningType> cleaningTypeCol = new TableColumn<>("Cleaning Type");
         cleaningTypeCol.prefWidthProperty().bind(stage.widthProperty().divide(6));
 
-        cleaningTypeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, String>, ObservableValue<String>>() {
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Cleaning, String> cleaning) {
-                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getCleaningType().toString());
+        cleaningTypeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Cleaning, CleaningType>, ObservableValue<CleaningType>>() {
+            public ObservableValue<CleaningType> call(TableColumn.CellDataFeatures<Cleaning, CleaningType> cleaning) {
+                return new ReadOnlyObjectWrapper<>(cleaning.getValue().getCleaningType());
             }
         });
 

@@ -159,6 +159,8 @@ public class UserCleaningsEditScreenBuilder implements Builder<Region> {
     }
 
     private void resetDataAndQuit() {
+        System.out.println("should clear");
+
         selectedCleaning.clear();
         dateTimeInput.clear();
         countryList.clear();

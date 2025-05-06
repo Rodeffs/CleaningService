@@ -125,7 +125,7 @@ public class Cleaning {
         this.address.set(otherCleaning.getAddress());
         this.placeType.set(otherCleaning.getPlaceType());
         this.cleaningType.set(otherCleaning.getCleaningType());
-        this.timestamp.setTime(timestamp.getTime());
+        this.timestamp.setTime(otherCleaning.getTimestamp().getTime());
         this.totalPrice.set(otherCleaning.getTotalPrice());
         this.cleanersAmount.set(otherCleaning.getCleanersAmount());
         this.client.set(otherCleaning.getClient());
