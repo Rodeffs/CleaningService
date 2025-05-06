@@ -15,6 +15,7 @@ public class Client {
     private final StringProperty email = new SimpleStringProperty();
     private final StringProperty phone = new SimpleStringProperty();
 
+
     public Client() {
         this.id.set(-1);
         this.name.set("");
@@ -124,5 +125,10 @@ public class Client {
     @Override
     public String toString() {
         return name.get() + " " + surname.get() + " " + secondName.get();
+    }
+
+    @Override
+    public String toString() {
+        return name + " " + surname + " " + secondName;
     }
 }
